@@ -1,6 +1,6 @@
 ;;; ui/doom/config.el -*- lexical-binding: t; -*-
 
-(set! :font "Fira Mono" :size 12)
+;; (set! :font "Fira Mono" :size 12)
 (set! :big-font "Fira Mono" :size 18)
 (set! :variable-font "Fira Sans" :size 12)
 (set! :unicode-font "DejaVu Sans Mono" :size 12)
