@@ -386,7 +386,8 @@
    (:map counsel-ag-map
      [backtab]  #'+ivy/wgrep-occur  ; search/replace on results
      "C-SPC"    #'counsel-git-grep-recenter   ; preview
-     "M-RET"    (+ivy-do-action! #'+ivy-git-grep-other-window-action)))
+     ;; "M-RET"    (+ivy-do-action! #'+ivy-git-grep-other-window-action)
+     ))
 
  ;; evil-commentary
  :n  "gc"  #'evil-commentary
