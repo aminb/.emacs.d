@@ -9,28 +9,18 @@
  [C-S-return] #'recompile
  :n "gl" #'recenter
  :n "/" #'swiper
- ;; "<A-right>" #'right-word
- ;; "<A-left>" #'left-word
- ;; "<A-backspace>" #'backward-kill-word
  ;; "C-=" #'count-words-region
  (:leader
    :n "cq" #'fill-paragraph
    :n "ca" #'auto-fill-mode
    :n "cc" #'count-words-region
-   ;; :n "tw" #'writeroom-mode
    )
  (:leader
    :desc "dashboard" :n "d" #'+doom-dashboard/open
    :desc "Centered Window Mode" :n "C" #'centered-window-mode
    (:desc "Dumb Jump" :prefix "j"
      :desc "Go" :n "j" #'dumb-jump-go
-     :desc "Back" :n "k" #'dumb-jump-back))
- ;; :leader :desc "Centered Window Mode" :n "C" #'centered-window-mode
-
- ;; (:after evil-magit
- ;;   :map (magit-status-mode-map magit-revision-mode-map)
- ;;   :n "N" #'magit-svn-popup)
- )
+     :desc "Back" :n "k" #'dumb-jump-back)))
 
 ;; (after! evil-escape
 ;;   ;; Change the evil escape sequence to fd instead of jk
@@ -113,43 +103,10 @@ FILENAME defaults to `buffer-file-name'."
 
 (setq tramp-default-method "ssh")
 
-;; (after! doom-themes
-  ;; Since Inconsolata doesn't have an italicized variant, use LGC instead
-  ;; (set-face-attribute 'italic nil
-  ;;                     :foreground "#333"
-  ;;                     :family "Inconsolata LGC"
-  ;;                     :height 100);; )
-
-;; (custom-theme-set-faces 'user
-;;  '(italic ((t (:slant italic
-;;                :height 100
-;;                :family "Inconsolata LGC")))))
-
-
-;; (def-package! writeroom-mode
-;;   :commands writeroom-mode)
-
 ;; (after! org
 ;;   (setq-default org-indent-indentation-per-level 4))
 
-;; (after! shackle
-  ;; (add-to-list 'shackle-rules '("\\`\\*notmuch.*?\\*\\'" :popup t)))
-
-;; (require 'material-theme)
-;; (require 'ample-theme)
-;; (require 'color-theme-sanityinc-tomorrow)
-;; (require 'flatui-theme)
-;; (require 'minimal-theme)
-;; (require 'solarized-theme)
-;; (require 'spacemacs-common)
-;; (require 'eziam-common)
-;; (require 'eziam-light-theme)
-;; (require 'nubox)
-;; (require 'nubox-light-theme)
-;; (require 'zerodark-theme)
-;; (require 'gruvbox)
 (require 'gruvbox-theme)
 (require 'gruvbox-light-hard-theme)
-;; (require 'gruvbox-light-medium-theme)
 ;; (require 'gruvbox-dark-medium-theme)
 
