@@ -16,5 +16,7 @@
       ;; +doom-modeline-buffer-file-name-style 'file-name
       )
 
-(setq-default fill-column 80)
+(setq-default fill-column 80
+              ;; bidi-display-reordering t
+              frame-inhibit-implied-resize nil)
 
