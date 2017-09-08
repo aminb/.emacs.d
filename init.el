@@ -133,5 +133,6 @@
        ;; source control (except for mine; use it as a reference).
        :private
        hlissner
-       amin)
+       amin
+       haskell)
 
