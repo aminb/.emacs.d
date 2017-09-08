@@ -134,5 +134,6 @@
        :private
        hlissner
        amin
-       haskell)
+       haskell
+       notmuch)
 
