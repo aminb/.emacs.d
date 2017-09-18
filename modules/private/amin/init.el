@@ -8,6 +8,7 @@
       user-full-name    "Amin Bandali")
 
 (setq +doom-modeline-height 32 ;; 36
+      doom-font (font-spec :family "Iosevka" :size 16)
       doom-variable-pitch-font (font-spec :family "Concourse T4" :size 15)
       doom-unicode-font (font-spec :family "DejaVu Sans Mono" :size 12)
       ;; doom-theme 'gruvbox-dark-medium
