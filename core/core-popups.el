@@ -35,9 +35,14 @@
   "The shackle rule that caused this buffer to be recognized as a popup.")
 
 (defvar doom-popup-window-parameters
-  '(:noesc :modeline :autokill :autoclose)
+  '(:noesc :modeline :autokill :autoclose :fixed)
   "A list of window parameters that are set (and cleared) when `doom-popup-mode
 is enabled/disabled.'")
+
+(defvar doom-popup-inhibit-autokill nil
+  "Don't set this directly. Let-bind it. When it is non-nil, no buffers will be
+killed when their associated popup windows are closed, despite their :autokill
+property.")
 
 (def-setting! :popup (&rest rules)
   "Prepend a new popup rule to `shackle-rules' (see for format details).
@@ -58,7 +63,11 @@ recognized by DOOM's popup system. They are:
             that have an :autokill property.
 
 :autoclose  If non-nil, close popup if ESC is pressed from outside
-            the popup window."
+            the popup window.
+
+:fixed      If non-nil, don't treat this window like a popup. This makes it
+            impervious to being automatically closed or tracked in popup
+            history. Excellent for permanent sidebars."
   (if (cl-every #'listp (mapcar #'doom-unquote rules))
       `(setq shackle-rules (nconc (list ,@rules) shackle-rules))
     `(push (list ,@rules) shackle-rules)))
@@ -230,7 +239,8 @@ and setting `doom-popup-rules' within it. Returns the window."
 prevent the popup(s) from messing up the UI (or vice versa)."
   (let ((in-popup-p (doom-popup-p))
         (popups (doom-popup-windows))
-        (doom-popup-remember-history t))
+        (doom-popup-remember-history t)
+        (doom-popup-inhibit-autokill t))
     (when popups
       (mapc #'doom/popup-close popups))
     (unwind-protect (apply orig-fn args)
@@ -248,7 +258,8 @@ properties."
       (setq doom-popup-windows (delq window doom-popup-windows))
       (when doom-popup-remember-history
         (setq doom-popup-history (list (doom--popup-data window))))
-      (let ((autokill-p (plist-get doom-popup-rules :autokill)))
+      (let ((autokill-p (and (not doom-popup-inhibit-autokill)
+                             (plist-get doom-popup-rules :autokill))))
         (with-selected-window window
           (doom-popup-mode -1)
           (when autokill-p
@@ -323,7 +334,7 @@ properties."
     "If current window is a popup, close it. If minibuffer is open, close it. If
 not in a popup, close all popups with an :autoclose property."
     (cond ((doom-popup-p)
-           (unless (doom-popup-prop :noesc)
+           (unless (doom-popup-property :noesc)
              (delete-window)))
           (t
            (doom/popup-close-all))))
@@ -486,7 +497,7 @@ the command buffer."
 
 (after! mu4e
   (defun doom*mu4e-popup-window (buf _height)
-    (doom-popup-buffer buf :size 10 :noselect t)
+    (doom-popup-buffer buf '(:size 10 :noselect t))
     buf)
   (advice-add #'mu4e~temp-window :override #'doom*mu4e-popup-window))
 
@@ -502,7 +513,7 @@ the command buffer."
   ;;
   ;; By handing neotree over to shackle, which is better integrated into the
   ;; rest of my config (and persp-mode), this is no longer a problem.
-  (set! :popup " *NeoTree*" :align 'left :size 25)
+  (set! :popup " *NeoTree*" :align neo-window-position :size neo-window-width :fixed t)
 
   (defun +evil-neotree-display-fn (buf _alist)
     "Hand neotree off to shackle."
@@ -515,7 +526,10 @@ the command buffer."
     "Repair neotree state whenever its popup state is restored. This ensures
 that `doom*popup-save' won't break it."
     (when (equal (buffer-name) neo-buffer-name)
-      (setq neo-global--window (selected-window))))
+      (setq neo-global--window (selected-window))
+      ;; Fix neotree shrinking when closing nearby vertical splits
+      (when neo-window-fixed-size
+        (doom-resize-window neo-global--window neo-window-width t t))))
   (add-hook 'doom-popup-mode-hook #'+evil|neotree-fix-popup))
 
 
@@ -589,9 +603,9 @@ you came from."
       '("^\\*Org-Babel"      :regexp t :size 25 :noselect t)
       '("^CAPTURE.*\\.org$"  :regexp t :size 20))
 
-    ;; Org has its own window management system with a scorched earth philosophy
-    ;; I'm not fond of. i.e. it kills all windows and monopolizes the frame. No
-    ;; thanks. We can do better with shackle's help.
+    ;; Org has a scorched-earth window management system I'm not fond of. i.e.
+    ;; it kills all windows and monopolizes the frame. No thanks. We can do
+    ;; better with shackle's help.
     (defun doom*suppress-delete-other-windows (orig-fn &rest args)
       (cl-letf (((symbol-function 'delete-other-windows)
                  (symbol-function 'ignore)))
@@ -600,17 +614,17 @@ you came from."
     (advice-add #'org-capture-place-template :around #'doom*suppress-delete-other-windows)
     (advice-add #'org-export--dispatch-ui :around #'doom*suppress-delete-other-windows)
 
-    ;; `org-edit-src-code' simply clones and narrows the buffer to a src block,
-    ;; so we are secretly manipulating the same buffer. Since truely killing it
-    ;; would kill the original org buffer we've got to do things differently.
-    (defun doom*org-src-switch-to-buffer (buffer _context)
+    ;; Hand off the src-block window to a shackle popup window.
+    (defun doom*org-src-pop-to-buffer (buffer _context)
+      "Open the src-edit in a way that shackle can detect."
       (if (eq org-src-window-setup 'switch-invisibly)
           (set-buffer buffer)
         (pop-to-buffer buffer)))
-    (advice-add #'org-src-switch-to-buffer :override #'doom*org-src-switch-to-buffer)
+    (advice-add #'org-src-switch-to-buffer :override #'doom*org-src-pop-to-buffer)
 
-    ;; Ensure todo, agenda, and other minor popups handed off to shackle.
+    ;; Ensure todo, agenda, and other minor popups are delegated to shackle.
     (defun doom*org-pop-to-buffer (&rest args)
+      "Use `pop-to-buffer' instead of `switch-to-buffer' to open buffer.'"
       (let ((buf (car args)))
         (pop-to-buffer
          (cond ((stringp buf) (get-buffer-create buf))
@@ -626,7 +640,7 @@ you came from."
       (add-hook 'org-agenda-finalize-hook #'doom-hide-modeline-mode)
       ;; Don't monopolize frame!
       (advice-add #'org-agenda :around #'doom*suppress-delete-other-windows)
-
+      ;; ensure quit keybindings work propertly
       (map! :map org-agenda-mode-map
             :m [escape] 'org-agenda-Quit
             :m "ESC"    'org-agenda-Quit)

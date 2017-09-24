@@ -4,26 +4,30 @@
 
 ;;;###autoload
 (defun doom-popup-p (&optional target)
-  "Return TARGET (a window) if TARGET (a window or buffer) is a popup. Uses
-current window if omitted."
+  "Return t if TARGET (a window or buffer) is a popup. Uses current window if
+omitted."
   (when-let (target (or target (selected-window)))
     (cond ((bufferp target)
-           (buffer-local-value 'doom-popup-mode target))
+           (and (buffer-local-value 'doom-popup-mode target)
+                (not (plist-get (buffer-local-value 'doom-popup-rules target) :fixed))))
           ((windowp target)
            (and (window-parameter target 'popup)
-                target)))))
+                (not (doom-popup-property :fixed target)))))))
 
 ;;;###autoload
-(defun doom-popup-buffer (buffer &rest plist)
-  "Display BUFFER in a shackle popup. See `shackle-rules' for possible rules.
-Returns the new popup window."
+(defun doom-popup-buffer (buffer plist &optional extend-p)
+  "Display BUFFER in a shackle popup with PLIST rules. See `shackle-rules' for
+possible rules. If EXTEND-P is non-nil, don't overwrite the original rules for
+this popup, just the specified properties. Returns the new popup window."
   (declare (indent defun))
   (unless (bufferp buffer)
     (error "%s is not a valid buffer" buffer))
-  (setq plist (append plist (shackle-match buffer)))
   (shackle-display-buffer
    buffer
-   nil (or plist (shackle-match buffer))))
+   nil (or (if extend-p
+               (append plist (shackle-match buffer))
+             plist)
+           (shackle-match buffer))))
 
 ;;;###autoload
 (defun doom-popup-switch-to-buffer (buffer)
@@ -39,12 +43,12 @@ Returns the new popup window."
     (set-window-dedicated-p nil t)))
 
 ;;;###autoload
-(defun doom-popup-file (file &rest plist)
+(defun doom-popup-file (file plist &optional extend-p)
   "Display FILE in a shackle popup, with PLIST rules. See `shackle-rules' for
 possible rules."
   (unless (file-exists-p file)
     (user-error "Can't display file in popup, it doesn't exist: %s" file))
-  (doom-popup-buffer (find-file-noselect file t) plist))
+  (doom-popup-buffer (find-file-noselect file t) plist extend-p))
 
 ;;;###autoload
 (defun doom-popup-windows ()
@@ -74,7 +78,7 @@ Returns t if popups were restored, nil otherwise."
                   (find-file-noselect file t))))
         (when size
           (setq rules (plist-put rules :size size)))
-        (when (and buffer (apply #'doom-popup-buffer buffer rules) (not any-p))
+        (when (and buffer (doom-popup-buffer buffer rules) (not any-p))
           (setq any-p t))))
     (when any-p
       (setq doom-popup-history '()))
@@ -89,7 +93,8 @@ Returns t if popups were restored, nil otherwise."
         (select-window doom-popup-other-window)
       (other-window 1)))
   (if (doom-popup-windows)
-      (doom/popup-close-all t)
+      (let ((doom-popup-inhibit-autokill t))
+        (doom/popup-close-all t))
     (doom/popup-restore)))
 
 ;;;###autoload
@@ -98,8 +103,8 @@ Returns t if popups were restored, nil otherwise."
 `selected-window'. The contained buffer is buried, unless it has an :autokill
 property."
   (interactive)
-  (when-let (window (doom-popup-p window))
-    (delete-window window)))
+  (when (doom-popup-p window)
+    (delete-window (or window (selected-window)))))
 
 ;;;###autoload
 (defun doom/popup-close-all (&optional force-p)
@@ -110,11 +115,11 @@ only close popups that have an :autoclose property in their rule (see
   (interactive)
   (when-let (popups (doom-popup-windows))
     (let (success doom-popup-remember-history)
-      (setq doom-popup-history (mapcar #'doom--popup-data popups))
+      (setq doom-popup-history (delq nil (mapcar #'doom--popup-data popups)))
       (dolist (window popups)
         (when (or force-p
                   (called-interactively-p 'interactive)
-                  (doom-popup-prop :autoclose window))
+                  (doom-popup-property :autoclose window))
           (delete-window window)
           (setq success t)))
       success)))
@@ -123,7 +128,7 @@ only close popups that have an :autoclose property in their rule (see
 (defun doom/popup-close-maybe ()
   "Close the current popup *if* its window doesn't have a noesc parameter."
   (interactive)
-  (if (doom-popup-prop :noesc)
+  (if (doom-popup-property :noesc)
       (call-interactively
        (if (featurep 'evil)
            #'evil-force-normal-state
@@ -134,7 +139,7 @@ only close popups that have an :autoclose property in their rule (see
 (defun doom/popup-this-buffer ()
   "Display currently selected buffer in a popup window."
   (interactive)
-  (doom-popup-buffer (current-buffer) :align t :autokill t))
+  (doom-popup-buffer (current-buffer) '(:align t :autokill t)))
 
 ;;;###autoload
 (defun doom/popup-toggle-messages ()
@@ -145,14 +150,20 @@ only close popups that have an :autoclose property in their rule (see
     (doom-popup-buffer (get-buffer "*Messages*"))))
 
 ;;;###autoload
-(defun doom-popup-prop (prop &optional window)
+(defun doom-popup-properties (window-or-buffer)
+  "Returns a window's popup property list, if possible. The buffer-local
+`doom-popup-rules' always takes priority, but this will fall back to the popup
+window parameter."
+  (cond ((windowp window-or-buffer)
+         (or (doom-popup-properties (window-buffer window-or-buffer))
+             (window-parameter window-or-buffer 'popup)))
+        ((bufferp window-or-buffer)
+         (buffer-local-value 'doom-popup-rules window-or-buffer))))
+
+;;;###autoload
+(defun doom-popup-property (prop &optional window)
   "Returns a `doom-popup-rules' PROPerty from WINDOW."
-  (or (plist-get (or (if window
-                         (ignore-errors
-                           (buffer-local-value 'doom-popup-rules
-                                               (window-buffer window)))
-                       doom-popup-rules)
-                     (window-parameter window 'popup))
+  (or (plist-get (doom-popup-properties (or window (selected-window)))
                  prop)
       (pcase prop
         (:size  shackle-default-size)
@@ -161,7 +172,7 @@ only close popups that have an :autoclose property in their rule (see
 ;;;###autoload
 (defun doom-popup-side (&optional window)
   "Return what side a popup WINDOW came from ('left 'right 'above or 'below)."
-  (let ((align (doom-popup-prop :align window)))
+  (let ((align (doom-popup-property :align window)))
     (when (eq align t)
       (setq align shackle-default-alignment))
     (when (functionp align)
@@ -174,13 +185,6 @@ only close popups that have an :autoclose property in their rule (see
   (pcase (doom-popup-side window)
     ((or 'left 'right)  (window-width window))
     ((or 'above 'below) (window-height window))))
-
-(defun doom--popup-data (window)
-  (when-let (buffer (window-buffer window))
-    `(,(buffer-name buffer)
-      :file  ,(buffer-file-name buffer)
-      :rules ,(window-parameter window 'popup)
-      :size  ,(doom-popup-size window))))
 
 ;;;###autoload
 (defmacro with-popup-rules! (rules &rest body)
@@ -207,3 +211,21 @@ only close popups that have an :autoclose property in their rule (see
         (cl-decf count))
       (when (/= count 0)
         (other-window count)))))
+
+;;;###autoload
+(defun doom-popup-move (direction)
+  "Move a popup window to another side of the frame, in DIRECTION, which can be
+one of the following: 'left 'right 'up 'down"
+  (when (doom-popup-p)
+    (let ((buffer (current-buffer))
+          (doom-popup-inhibit-autokill t))
+      (doom/popup-close)
+      (doom-popup-buffer buffer '(:align direction) 'extend))))
+
+(defun doom--popup-data (window)
+  (unless (doom-popup-property :fixed window)
+    (when-let (buffer (window-buffer window))
+      `(,(buffer-name buffer)
+        :file  ,(buffer-file-name buffer)
+        :rules ,(window-parameter window 'popup)
+        :size  ,(doom-popup-size window)))))
