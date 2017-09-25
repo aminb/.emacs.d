@@ -15,7 +15,7 @@ omitted."
                 (not (doom-popup-property :fixed target)))))))
 
 ;;;###autoload
-(defun doom-popup-buffer (buffer plist &optional extend-p)
+(defun doom-popup-buffer (buffer &optional plist extend-p)
   "Display BUFFER in a shackle popup with PLIST rules. See `shackle-rules' for
 possible rules. If EXTEND-P is non-nil, don't overwrite the original rules for
 this popup, just the specified properties. Returns the new popup window."
@@ -43,7 +43,7 @@ this popup, just the specified properties. Returns the new popup window."
     (set-window-dedicated-p nil t)))
 
 ;;;###autoload
-(defun doom-popup-file (file plist &optional extend-p)
+(defun doom-popup-file (file &optional plist extend-p)
   "Display FILE in a shackle popup, with PLIST rules. See `shackle-rules' for
 possible rules."
   (unless (file-exists-p file)
@@ -197,6 +197,24 @@ window parameter."
      (setq shackle-rules old-shackle-rules)))
 
 ;;;###autoload
+(defmacro save-popups! (&rest body)
+  "Sets aside all popups before executing the original function, usually to
+prevent the popup(s) from messing up the UI (or vice versa)."
+  `(let ((in-popup-p (doom-popup-p))
+         (popups (doom-popup-windows))
+         (doom-popup-remember-history t)
+         (doom-popup-inhibit-autokill t))
+     (when popups
+       (mapc #'doom/popup-close popups))
+     (unwind-protect
+         (progn ,@body)
+       (when popups
+         (let ((origin (selected-window)))
+           (doom/popup-restore)
+           (unless in-popup-p
+             (select-window origin)))))))
+
+;;;###autoload
 (defun doom/other-popup (count)
   "Cycle through popup windows. Like `other-window', but for popups."
   (interactive "p")
@@ -211,6 +229,16 @@ window parameter."
         (cl-decf count))
       (when (/= count 0)
         (other-window count)))))
+
+;;;###autoload
+(defun doom/popup-raise (&optional window)
+  "Turn a popup window into a normal window."
+  (interactive)
+  (let ((window (or window (selected-window))))
+    (unless (doom-popup-p window)
+      (user-error "Not a valid popup to raise"))
+    (with-selected-window window
+      (doom-popup-mode -1))))
 
 ;;;###autoload
 (defun doom-popup-move (direction)
