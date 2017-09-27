@@ -170,27 +170,6 @@ active."
 
 
 ;;
-;; Bootstrap
-;;
-
-;; Show version string for multi-version managers like rvm, rbenv, pyenv, etc.
-(defvar-local +doom-modeline-env-version nil)
-(defvar-local +doom-modeline-env-command nil)
-(add-hook! '(focus-in-hook find-file-hook) #'+doom-modeline|update-env)
-(defun +doom-modeline|update-env ()
-  (when +doom-modeline-env-command
-    (let* ((default-directory (doom-project-root))
-           (s (shell-command-to-string +doom-modeline-env-command)))
-      (setq +doom-modeline-env-version (if (string-match "[ \t\n\r]+\\'" s)
-                                           (replace-match "" t t s)
-                                         s)))))
-
-;; Only support python and ruby for now
-(add-hook! 'python-mode-hook (setq +doom-modeline-env-command "python --version 2>&1 | cut -d' ' -f2"))
-(add-hook! 'ruby-mode-hook   (setq +doom-modeline-env-command "ruby   --version 2>&1 | cut -d' ' -f2"))
-
-
-;;
 ;; Modeline helpers
 ;;
 
@@ -316,8 +295,8 @@ Example:
 ;; Segments
 ;;
 
-(def-modeline-segment! buffer-project
-  "Displays `doom-project-root'. This is for special buffers like the scratch
+(def-modeline-segment! buffer-default-directory
+  "Displays `default-directory'. This is for special buffers like the scratch
 buffer where knowing the current project directory is important."
   (let ((face (if (active) 'doom-modeline-buffer-path)))
     (concat (if (display-graphic-p) " ")
@@ -326,7 +305,7 @@ buffer where knowing the current project directory is important."
              :face face
              :v-adjust -0.05
              :height 1.25)
-            (propertize (concat " " (abbreviate-file-name (doom-project-root)))
+            (propertize (concat " " (abbreviate-file-name default-directory))
                         'face face))))
 
 ;;
@@ -365,8 +344,12 @@ directory, the file name, and its state (modified, read-only or non-existent)."
 
 ;;
 (def-modeline-segment! buffer-info-simple
-  "Return the current buffer name only, but with fontification."
-  (propertize "%b" 'face (if (active) 'doom-modeline-buffer-file)))
+  "Display only the current buffer's name, but with fontification."
+  (propertize
+   "%b"
+   'face (cond ((and buffer-file-name (buffer-modified-p))
+                'doom-modeline-buffer-modified)
+               ((active) 'doom-modeline-buffer-file))))
 
 ;;
 (def-modeline-segment! buffer-encoding
@@ -388,8 +371,6 @@ directory, the file name, and its state (modified, read-only or non-existent)."
    (concat (format-mode-line mode-name)
            (when (stringp mode-line-process)
              mode-line-process)
-           (when +doom-modeline-env-version
-             (concat " " +doom-modeline-env-version))
            (and (featurep 'face-remap)
                 (/= text-scale-mode-amount 0)
                 (format " (%+d)" text-scale-mode-amount)))
@@ -614,7 +595,7 @@ Returns \"\" to not break --no-window-system."
   (buffer-encoding major-mode flycheck))
 
 (def-modeline! project
-  (bar buffer-project)
+  (bar buffer-default-directory)
   (major-mode))
 
 (def-modeline! media

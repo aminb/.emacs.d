@@ -18,10 +18,6 @@
   "A list of popups that were last closed. Used by `doom/popup-restore' and
 `doom*popups-save'.")
 
-(defvar doom-popup-remember-history t
-  "If non-nil, DOOM will remember the last popup(s) that were open in
-`doom-popup-history'.")
-
 (defvar doom-popup-other-window nil
   "The last window selected before a popup was opened.")
 
@@ -32,16 +28,22 @@
   "A list of open popup windows.")
 
 (defvar-local doom-popup-rules nil
-  "The shackle rule that caused this buffer to be recognized as a popup.")
+  "The shackle rule that caused this buffer to be recognized as a popup. Don't
+edit this directly.")
 
 (defvar doom-popup-window-parameters
-  '(:noesc :modeline :autokill :autoclose :fixed)
+  '(:noesc :modeline :autokill :autoclose :autofit :static)
   "A list of window parameters that are set (and cleared) when `doom-popup-mode
 is enabled/disabled.'")
 
+;; let-vars
+(defvar doom-popup-remember-history t
+  "Don't modify this directly. If non-nil, DOOM will remember the last popup(s)
+that were open in `doom-popup-history'.")
+
 (defvar doom-popup-inhibit-autokill nil
-  "Don't set this directly. Let-bind it. When it is non-nil, no buffers will be
-killed when their associated popup windows are closed, despite their :autokill
+  "Don't modify this directly. When it is non-nil, no buffers will be killed
+when their associated popup windows are closed, despite their :autokill
 property.")
 
 (def-setting! :popup (&rest rules)
@@ -50,22 +52,25 @@ property.")
 Several custom properties have been added that are not part of shackle, but are
 recognized by DOOM's popup system. They are:
 
-:noesc      If non-nil, pressing ESC *inside* the popup will close it.
-            Used by `doom/popup-close-maybe'.
+:noesc      If non-nil, the popup won't be closed if you press ESC from *inside*
+            its window. Used by `doom/popup-close-maybe'.
 
-:modeline   By default, mode-lines are hidden in popups unless this
-            is non-nil. If it is a symbol, it'll use `doom-modeline'
-            to fetch a modeline config (in `doom-popup-mode').
+:modeline   By default, mode-lines are hidden in popups unless this is non-nil. If
+            it is a symbol, it'll use `doom-modeline' to fetch a modeline config
+            (in `doom-popup-mode').
 
-:autokill   If non-nil, the popup's buffer will be killed when the
-            popup is closed. Used by `doom*delete-popup-window'.
-            NOTE `doom/popup-restore' can't restore non-file popups
-            that have an :autokill property.
+:autokill   If non-nil, the popup's buffer will be killed when the popup is
+            closed. Used by `doom*delete-popup-window'. NOTE
+            `doom/popup-restore' can't restore non-file popups that have an
+            :autokill property.
 
-:autoclose  If non-nil, close popup if ESC is pressed from outside
-            the popup window.
+:autoclose  If non-nil, close popup if ESC is pressed from outside the popup
+            window.
 
-:fixed      If non-nil, don't treat this window like a popup. This makes it
+:autofit    If non-nil, resize the popup to fit its content. Uses the value of
+            the :size property as the maximum height/width.
+
+:static     If non-nil, don't treat this window like a popup. This makes it
             impervious to being automatically closed or tracked in popup
             history. Excellent for permanent sidebars."
   (if (cl-every #'listp (mapcar #'doom-unquote rules))
@@ -85,8 +90,9 @@ recognized by DOOM's popup system. They are:
         shackle-rules
         '(("^\\*ftp " :noselect t :autokill t :noesc t)
           ;; doom
+          ("^\\*doom:scratch" :regexp t :size 12 :noesc t :select t :modeline t :autokill t :static t)
           ("^\\*doom:" :regexp t :size 0.35 :noesc t :select t :modeline t)
-          ("^\\*doom " :regexp t :noselect t :autokill t :autoclose t)
+          ("^\\*doom " :regexp t :noselect t :autokill t :autoclose t :autofit t)
           ;; built-in (emacs)
           ("*ert*" :same t :modeline t)
           ("*info*" :size 0.5 :select t :autokill t)
@@ -102,7 +108,7 @@ recognized by DOOM's popup system. They are:
           (profiler-report-mode :size 0.3 :regexp t :autokill t :modeline minimal)
           (tabulated-list-mode :noesc t)
           (special-mode :noselect t :autokill t :autoclose t)
-          ("^\\*"  :regexp t :noselect t :autokill t)
+          ("^\\*"  :regexp t :noselect t :autokill t :autofit t)
           ("^ \\*" :regexp t :size 12 :noselect t :autokill t :autoclose t)))
 
   :config
@@ -135,16 +141,16 @@ for :align t on every rule."
 
 (defvar doom-popup-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map [escape]    'doom/popup-close-maybe)
-    (define-key map (kbd "ESC") 'doom/popup-close-maybe)
-    (define-key map [remap doom-kill-buffer] 'kill-this-buffer)
-    (define-key map [remap doom/kill-this-buffer] 'kill-this-buffer)
-    (define-key map [remap split-window-right] 'ignore)
-    (define-key map [remap split-window-below] 'ignore)
-    (define-key map [remap split-window-horizontally] 'ignore)
-    (define-key map [remap split-window-vertically] 'ignore)
-    (define-key map [remap mouse-split-window-horizontally] 'ignore)
-    (define-key map [remap mouse-split-window-vertically] 'ignore)
+    (define-key map [escape]    #'doom/popup-close-maybe)
+    (define-key map (kbd "ESC") #'doom/popup-close-maybe)
+    (define-key map [remap doom-kill-buffer] #'kill-this-buffer)
+    (define-key map [remap doom/kill-this-buffer] #'kill-this-buffer)
+    (define-key map [remap split-window-right] #'ignore)
+    (define-key map [remap split-window-below] #'ignore)
+    (define-key map [remap split-window-horizontally] #'ignore)
+    (define-key map [remap split-window-vertically] #'ignore)
+    (define-key map [remap mouse-split-window-horizontally] #'ignore)
+    (define-key map [remap mouse-split-window-vertically] #'ignore)
     map)
   "Active keymap in popup windows.")
 
@@ -154,9 +160,7 @@ for :align t on every rule."
   :keymap doom-popup-mode-map
   (let ((window (selected-window)))
     ;; If `doom-popup-rules' isn't set for some reason, try to set it
-    (when-let (plist (and (not doom-popup-rules)
-                          (window-parameter window 'popup)))
-      (setq-local doom-popup-rules (window-parameter window 'popup)))
+    (setq-local doom-popup-rules (doom-popup-properties window))
     ;; Ensure that buffer-opening functions/commands (like
     ;; `switch-to-buffer-other-window' won't use this window).
     (set-window-parameter window 'no-other-window doom-popup-mode)
@@ -231,7 +235,11 @@ and setting `doom-popup-rules' within it. Returns the window."
     (with-selected-window window
       (unless (eq plist t)
         (setq-local doom-popup-rules plist))
-      (doom-popup-mode +1))
+      (doom-popup-mode +1)
+      (when (and (plist-get plist :autofit)
+                 (not (string-empty-p (buffer-string))))
+        (let ((max-size (plist-get plist :size)))
+          (fit-window-to-buffer window max-size nil max-size))))
     window))
 
 (defun doom*popups-save (orig-fn &rest args)
@@ -248,7 +256,7 @@ properties."
       (when doom-popup-remember-history
         (setq doom-popup-history (list (doom--popup-data window))))
       (let ((autokill-p (and (not doom-popup-inhibit-autokill)
-                             (plist-get doom-popup-rules :autokill))))
+                             (doom-popup-property :autokill window))))
         (with-selected-window window
           (doom-popup-mode -1)
           (when autokill-p
@@ -312,10 +320,10 @@ properties."
   (let ((map doom-popup-mode-map))
     (define-key map [remap evil-window-delete]           #'doom/popup-close)
     (define-key map [remap evil-save-modified-and-close] #'doom/popup-close)
-    (define-key map [remap evil-window-move-very-bottom] #'ignore)
-    (define-key map [remap evil-window-move-very-top]    #'ignore)
-    (define-key map [remap evil-window-move-far-left]    #'ignore)
-    (define-key map [remap evil-window-move-far-right]   #'ignore)
+    (define-key map [remap evil-window-move-very-bottom] #'doom/popup-move-bottom)
+    (define-key map [remap evil-window-move-very-top]    #'doom/popup-move-top)
+    (define-key map [remap evil-window-move-far-left]    #'doom/popup-move-left)
+    (define-key map [remap evil-window-move-far-right]   #'doom/popup-move-right)
     (define-key map [remap evil-window-split]            #'ignore)
     (define-key map [remap evil-window-vsplit]           #'ignore))
 
@@ -384,10 +392,10 @@ the command buffer."
 
 
 (after! helm
-  ;; Helm tries to clean up after itself, but shackle has already done this.
-  ;; This fixes that. To reproduce, add a helm rule in `shackle-rules', open two
-  ;; splits side-by-side, move to the buffer on the right and invoke helm. It
-  ;; will close all but the left-most buffer.
+  ;; Helm tries to clean up after itself, but shackle has already done this,
+  ;; causing problems. This fixes that. To reproduce, add a helm rule in
+  ;; `shackle-rules', open two splits side-by-side, move to the buffer on the
+  ;; right and invoke helm. It will close all but the left-most buffer.
   (setq-default helm-reuse-last-window-split-state t
                 helm-split-window-in-side-p t)
 
@@ -502,7 +510,7 @@ the command buffer."
   ;;
   ;; By handing neotree over to shackle, which is better integrated into the
   ;; rest of my config (and persp-mode), this is no longer a problem.
-  (set! :popup " *NeoTree*" :align neo-window-position :size neo-window-width :fixed t)
+  (set! :popup " *NeoTree*" :align neo-window-position :size neo-window-width :static t)
 
   (defun +evil-neotree-display-fn (buf _alist)
     "Hand neotree off to shackle."
@@ -526,7 +534,7 @@ that `doom*popup-save' won't break it."
   (defun doom*persp-mode-restore-popups (&rest _)
     "Restore popup windows when loading a perspective from file."
     (dolist (window (window-list))
-      (when-let (plist (window-parameter window 'popup))
+      (when-let (plist (doom-popup-properties window))
         (with-selected-window window
           (unless doom-popup-mode
             (setq-local doom-popup-rules plist)
@@ -632,10 +640,7 @@ you came from."
       ;; ensure quit keybindings work propertly
       (map! :map org-agenda-mode-map
             :m [escape] 'org-agenda-Quit
-            :m "ESC"    'org-agenda-Quit)
-      (let ((map org-agenda-mode-map))
-        (define-key map "q" 'org-agenda-Quit)
-        (define-key map "Q" 'org-agenda-Quit)))))
+            :m "ESC"    'org-agenda-Quit))))
 (add-hook 'doom-init-hook #'doom|init-org-popups)
 
 (provide 'core-popups)
