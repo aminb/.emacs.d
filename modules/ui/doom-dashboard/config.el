@@ -54,8 +54,7 @@ if in a GUI/non-daemon session."
   (add-hook 'focus-in-hook #'+doom-dashboard-reload)
   (add-hook 'kill-buffer-query-functions #'+doom-dashboard|kill-buffer-query-fn)
   (when (and (display-graphic-p) (not (daemonp)))
-    (let ((default-directory doom-emacs-dir))
-      (+doom-dashboard/open (selected-frame)))))
+    (+doom-dashboard/open (selected-frame))))
 
 (defun +doom-dashboard|kill-buffer-query-fn ()
   (or (not (+doom-dashboard-p))
