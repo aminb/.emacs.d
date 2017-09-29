@@ -12,7 +12,11 @@
       doom-variable-pitch-font (font-spec :family "Concourse T4" :size 15)
       doom-unicode-font (font-spec :family "DejaVu Sans Mono" :size 12)
       ;; doom-theme 'gruvbox-dark-medium
-      doom-theme 'gruvbox-light-hard
+      ;; doom-theme 'gruvbox-light-hard
+      ;; doom-theme 'tao-yang
+      ;; doom-theme 'tao-yin
+      ;; doom-theme 'flatui
+      doom-theme 'doom-one-light
       text-scale-mode-step 1.05
       ;; +doom-modeline-buffer-file-name-style 'file-name
       )

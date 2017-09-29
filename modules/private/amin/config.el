@@ -106,7 +106,13 @@ FILENAME defaults to `buffer-file-name'."
 ;; (after! org
 ;;   (setq-default org-indent-indentation-per-level 4))
 
-(require 'gruvbox-theme)
-(require 'gruvbox-light-hard-theme)
+;; (require 'gruvbox-theme)
+;; (require 'gruvbox-light-hard-theme)
 ;; (require 'gruvbox-dark-medium-theme)
+
+;; (require 'tao-theme)
+;; (require 'tao-yang-theme)
+;; (require 'tao-yin-theme)
+
+;; (require 'flatui-theme)
 
