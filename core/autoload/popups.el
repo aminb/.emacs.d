@@ -8,9 +8,11 @@
 omitted."
   (when-let (target (or target (selected-window)))
     (cond ((bufferp target)
-           (buffer-local-value 'doom-popup-mode target))
+           (and (buffer-live-p target)
+                (buffer-local-value 'doom-popup-mode target)))
           ((windowp target)
-           (window-parameter target 'popup)))))
+           (and (window-live-p target)
+                (window-parameter target 'popup))))))
 
 ;;;###autoload
 (defun doom-popup-buffer (buffer &optional plist extend-p)
@@ -87,7 +89,8 @@ Returns t if popups were restored, nil otherwise."
 
 ;;;###autoload
 (defun doom/popup-toggle ()
-  "Toggle popups."
+  "Toggle popups on and off. If used outside of popups (and popups are
+available), it will select the nearest popup window."
   (interactive)
   (when (doom-popup-p)
     (if doom-popup-other-window

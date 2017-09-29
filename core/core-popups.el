@@ -55,9 +55,9 @@ recognized by DOOM's popup system. They are:
 :noesc      If non-nil, the popup won't be closed if you press ESC from *inside*
             its window. Used by `doom/popup-close-maybe'.
 
-:modeline   By default, mode-lines are hidden in popups unless this is non-nil. If
-            it is a symbol, it'll use `doom-modeline' to fetch a modeline config
-            (in `doom-popup-mode').
+:modeline   By default, mode-lines are hidden in popups unless this is non-nil.
+            If it is a symbol, it'll use `doom-modeline' to fetch a modeline
+            config (in `doom-popup-mode').
 
 :autokill   If non-nil, the popup's buffer will be killed when the popup is
             closed. Used by `doom*delete-popup-window'. NOTE
@@ -88,16 +88,17 @@ recognized by DOOM's popup system. They are:
   (setq shackle-default-alignment 'below
         shackle-default-size 8
         shackle-rules
-        '(("^\\*ftp " :noselect t :autokill t :noesc t)
+        '(("^\\*eww" :regexp t :size 0.5 :select t :autokill t :noesc t)
+          ("^\\*ftp " :noselect t :autokill t :noesc t)
           ;; doom
           ("^\\*doom:scratch" :regexp t :size 12 :noesc t :select t :modeline t :autokill t :static t)
-          ("^\\*doom:" :regexp t :size 0.35 :noesc t :select t :modeline t)
-          ("^\\*doom " :regexp t :noselect t :autokill t :autoclose t :autofit t)
+          ("^\\*doom:" :regexp t :size 0.35 :noesc t :select t)
+          ("^ ?\\*doom " :regexp t :noselect t :autokill t :autoclose t :autofit t)
           ;; built-in (emacs)
           ("*ert*" :same t :modeline t)
           ("*info*" :size 0.5 :select t :autokill t)
           ("*Backtrace*" :size 20 :noselect t)
-          ("*Warnings*"  :size 8  :noselect t)
+          ("*Warnings*"  :size 12 :noselect t :autofit t)
           ("*Messages*"  :size 12 :noselect t)
           ("*Help*" :size 0.3)
           ("^\\*.*Shell Command.*\\*$" :regexp t :size 20 :noselect t :autokill t)
@@ -108,7 +109,7 @@ recognized by DOOM's popup system. They are:
           (profiler-report-mode :size 0.3 :regexp t :autokill t :modeline minimal)
           (tabulated-list-mode :noesc t)
           (special-mode :noselect t :autokill t :autoclose t)
-          ("^\\*"  :regexp t :noselect t :autokill t :autofit t)
+          ("^\\*"  :regexp t :size 12 :noselect t :autokill t :autofit t)
           ("^ \\*" :regexp t :size 12 :noselect t :autokill t :autoclose t)))
 
   :config
@@ -238,6 +239,7 @@ and setting `doom-popup-rules' within it. Returns the window."
       (doom-popup-mode +1)
       (when (and (plist-get plist :autofit)
                  (not (string-empty-p (buffer-string))))
+        ;; TODO calculated window-width/window-height alternative
         (let ((max-size (plist-get plist :size)))
           (fit-window-to-buffer window max-size nil max-size))))
     window))
@@ -274,20 +276,20 @@ properties."
 ;;
 
 (progn ; hacks for built-in functions
-  (defun doom*buffer-menu (&optional arg)
-    "Open `buffer-menu' in a popup window."
-    (interactive "P")
-    (let ((buf (list-buffers-noselect arg)))
-      (doom-popup-buffer buf)
-      (with-current-buffer buf
-        (setq mode-line-format "Commands: d, s, x, u; f, o, 1, 2, m, v; ~, %; q to quit; ? for help."))))
-  (advice-add #'buffer-menu :override #'doom*buffer-menu)
-
   (defun doom*suppress-pop-to-buffer-same-window (orig-fn &rest args)
     (cl-letf (((symbol-function 'pop-to-buffer-same-window)
                (symbol-function 'pop-to-buffer)))
       (apply orig-fn args)))
-  (advice-add #'info :around #'doom*suppress-pop-to-buffer-same-window))
+  (advice-add #'info :around #'doom*suppress-pop-to-buffer-same-window)
+  (advice-add #'eww :around #'doom*suppress-pop-to-buffer-same-window)
+  (advice-add #'eww-browse-url :around #'doom*suppress-pop-to-buffer-same-window)
+
+  (defun doom*buffer-menu (&optional arg)
+    "Open `buffer-menu' in a popup window."
+    (interactive "P")
+    (with-selected-window (doom-popup-buffer (list-buffers-noselect arg))
+      (setq mode-line-format "Commands: d, s, x, u; f, o, 1, 2, m, v; ~, %; q to quit; ? for help.")))
+  (advice-add #'buffer-menu :override #'doom*buffer-menu))
 
 
 (after! comint
@@ -595,7 +597,7 @@ you came from."
       '("*Org Links*"        :size 5   :noselect t)
       '("*Org Export Dispatcher*" :noselect t)
       '(" *Agenda Commands*" :noselect t)
-      '("^\\*Org Agenda"     :regexp t :size 30)
+      '("^\\*Org Agenda"     :regexp t :size 20)
       '("*Org Clock*"        :noselect t)
       '("^\\*Org Src"        :regexp t :size 0.35 :noesc t)
       '("*Edit Formulas*"    :size 10)
@@ -637,6 +639,7 @@ you came from."
 
       ;; Hide modeline in org-agenda
       (add-hook 'org-agenda-finalize-hook #'doom-hide-modeline-mode)
+      (add-hook 'org-agenda-finalize-hook #'org-fit-window-to-buffer)
       ;; Don't monopolize frame!
       (advice-add #'org-agenda :around #'doom*suppress-delete-other-windows)
       ;; ensure quit keybindings work propertly

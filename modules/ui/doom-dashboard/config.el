@@ -3,9 +3,6 @@
 (defvar +doom-dashboard-name " *doom*"
   "The name to use for the dashboard buffer.")
 
-(defvar +doom-dashboard-modeline nil
-  "The modeline format for the doom dashboard buffer.")
-
 (defvar +doom-dashboard-inhibit-refresh nil
   "If non-nil, the doom buffer won't be refreshed.")
 
@@ -15,17 +12,15 @@
 (defvar +doom-dashboard--width 80)
 (defvar +doom-dashboard--height 0)
 (defvar +doom-dashboard--old-fringe-indicator fringe-indicator-alist)
-(defvar +doom-dashboard--old-modeline nil)
 
 (setq doom-fallback-buffer +doom-dashboard-name)
 
 
 (define-derived-mode +doom-dashboard-mode special-mode
-  (concat "v" doom-version)
+  (format "DOOM v%s" doom-version)
   "Major mode for the DOOM dashboard buffer."
   (read-only-mode +1)
-  (setq truncate-lines t
-        mode-line-format +doom-dashboard-modeline)
+  (setq truncate-lines t)
   (cl-loop for (car . _cdr) in fringe-indicator-alist
            collect (cons car nil) into alist
            finally do (setq fringe-indicator-alist alist)))
@@ -101,12 +96,6 @@ whose dimensions may not be fully initialized by the time this is run."
   (when (get-buffer-window (doom-fallback-buffer))
     (unless (or +doom-dashboard-inhibit-refresh
                 (window-minibuffer-p (frame-selected-window)))
-      (unless +doom-dashboard-modeline
-        (setq +doom-dashboard--old-modeline mode-line-format
-              +doom-dashboard-modeline
-              (or (and (featurep! :ui doom-modeline)
-                       (doom-modeline 'project))
-                  mode-line-format)))
       (let ((old-pwd (or dir default-directory))
             (fallback-buffer (doom-fallback-buffer)))
         (with-current-buffer fallback-buffer
@@ -115,11 +104,19 @@ whose dimensions may not be fully initialized by the time this is run."
               (+doom-dashboard-mode))
             (erase-buffer)
             (setq default-directory old-pwd)
-            (let ((+doom-dashboard--height (window-height (get-buffer-window fallback-buffer))))
-              (insert (make-string (max 0 (- (truncate (/ +doom-dashboard--height 2)) 16)) ?\n))
-              (dolist (widget-name +doom-dashboard-widgets)
-                (funcall (intern (format "doom-dashboard-widget--%s" widget-name)))
-                (insert "\n")))
+            (let ((+doom-dashboard--height (window-height (get-buffer-window fallback-buffer)))
+                  (lines 1)
+                  content)
+              (with-temp-buffer
+                (dolist (widget-name +doom-dashboard-widgets)
+                  (funcall (intern (format "doom-dashboard-widget--%s" widget-name)))
+                  (insert "\n"))
+                (setq content (buffer-string)
+                      lines (count-lines (point-min) (point-max))))
+              (insert (make-string (max 0 (- (/ +doom-dashboard--height 2)
+                                             (/ lines 2)))
+                                   ?\n)
+                      content))
             (unless (button-at (point))
               (goto-char (next-button (point-min))))))))
     ;; Update all dashboard windows
@@ -157,11 +154,13 @@ whose dimensions may not be fully initialized by the time this is run."
 
 (defun doom-dashboard-widget--loaded ()
   (insert
+   "\n"
    (propertize
     (+doom-dashboard-center
      +doom-dashboard--width
-     (format "Loaded %d packages in %.02fs"
+     (format "Loaded %d packages in %d modules in %.02fs"
              (- (length load-path) (length doom--base-load-path))
+             (hash-table-size doom-modules)
              (if (floatp doom-init-time) doom-init-time 0.0)))
     'face 'font-lock-comment-face)
    "\n"))
@@ -169,8 +168,8 @@ whose dimensions may not be fully initialized by the time this is run."
 (defvar all-the-icons-scale-factor)
 (defvar all-the-icons-default-adjust)
 (defun doom-dashboard-widget--shortmenu ()
-  (let ((all-the-icons-scale-factor 1.3)
-        (all-the-icons-default-adjust -0.05))
+  (let ((all-the-icons-scale-factor 1.45)
+        (all-the-icons-default-adjust -0.02))
     (mapc (lambda (btn)
             (when btn
               (cl-destructuring-bind (label icon fn) btn
@@ -181,17 +180,20 @@ whose dimensions may not be fully initialized by the time this is run."
                             (propertize (concat " " label) 'face 'font-lock-keyword-face))
                     'action `(lambda (_) ,fn)
                     'follow-link t)
-                   (+doom-dashboard-center (1- +doom-dashboard--width) (buffer-string)))
+                   (+doom-dashboard-center (- +doom-dashboard--width 2) (buffer-string)))
                  "\n\n"))))
           `(("Homepage" "mark-github"
              (browse-url "https://github.com/hlissner/doom-emacs"))
-            ,(when (and (and (featurep 'persp-mode) persp-mode)
+            ,(when (and (featurep! :feature workspaces)
                         (file-exists-p (expand-file-name persp-auto-save-fname persp-save-dir)))
                '("Reload last session" "history"
                  (+workspace/load-session)))
+            ,(when (featurep! :org org)
+               '("See agenda for this week" "calendar"
+                 (call-interactively 'org-agenda-list)))
             ("Recently opened files" "file-text"
-             (call-interactively (command-remapping 'recentf)))
-            ("Recent opened projects" "briefcase"
+             (call-interactively (command-remapping 'recentf-open-files)))
+            ("Open project" "briefcase"
              (call-interactively (command-remapping 'projectile-switch-project)))
             ("Jump to bookmark" "bookmark"
              (call-interactively (command-remapping 'bookmark-jump)))
