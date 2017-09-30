@@ -24,8 +24,9 @@
   (add-hook 'message-mode-hook
             '(lambda () (setq fill-column 65))
             'append)
-  (add-hook 'message-setup-hook
-            #'mml-secure-message-sign-pgpmime))
+  ;; (add-hook 'message-setup-hook
+  ;;           #'mml-secure-message-sign-pgpmime)
+  )
 
 (after! mml-sec
   (setq mml-secure-openpgp-encrypt-to-self t
@@ -45,8 +46,6 @@
         '(("amin@aminb.org" . "amin/Sent")
           ("aminb@gnu.org"  . "gnu/Sent")
           (".*"             . "sent")))
-  ;; (set! :popup
-  ;;   '("\\`\\*notmuch.*?\\*\\'" :popup t))
   )
 
 (after! notmuch-crypto
