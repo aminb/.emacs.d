@@ -79,7 +79,7 @@
    :desc "Ex command"  :nv ";"   #'evil-ex
    :desc "M-x"         :nv ":"   #'execute-extended-command
    :desc "Pop up scratch buffer"   :nv "x"  #'doom/scratch-buffer
-   :desc "Org Capture"             :nv "X"  #'+org-capture/dwim
+   :desc "Org Capture"             :nv "X"  #'+org-capture/open
 
    ;; Most commonly used
    :desc "Find file in project"    :n "SPC" #'projectile-find-file
@@ -226,7 +226,7 @@
    (:desc "notes" :prefix "n"
      :desc "Find file in notes"    :n "n" #'+hlissner/find-in-notes
      :desc "Browse notes"          :n "N" #'+hlissner/browse-notes
-     :desc "Org capture"           :n "x" #'+org-capture/dwim
+     :desc "Org capture"           :n "x" #'+org-capture/open
      :desc "Browse mode notes"     :n "m" #'+org/browse-notes-for-major-mode
      :desc "Browse project notes"  :n "p" #'+org/browse-notes-for-project)
 
@@ -730,7 +730,6 @@
 ;; properly, more like vim, or how I like it.
 
 (map! (:map input-decode-map
-        [?\C-i] [C-i]
         [S-iso-lefttab] [backtab]
         (:unless window-system "TAB" [tab])) ; Fix TAB in terminal
 
