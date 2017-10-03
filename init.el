@@ -86,7 +86,7 @@
       ;elm               ; care for a cup of TEA?
        emacs-lisp        ; drown in parentheses
       ;go                ; the hipster dialect
-       (haskell +intero) ; a language that's lazier than I am
+      ;(haskell +intero) ; a language that's lazier than I am
       ;hy                ; readability of scheme w/ speed of python
       ;(java +meghanada) ; the poster child for carpal tunnel syndrome
       ;javascript        ; all(hope(abandon(ye(who(enter(here))))))
