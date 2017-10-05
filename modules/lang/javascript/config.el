@@ -21,15 +21,21 @@
   (sp-with-modes '(js2-mode rjsx-mode)
     (sp-local-pair "/* " " */" :post-handlers '(("| " "SPC"))))
 
-  ;; Favor local eslint over global, if available
-  (defun +javascript|init-flycheck-elint ()
+  ;; If it's available globally, use eslint_d
+  (setq flycheck-javascript-eslint-executable (executable-find "eslint_d"))
+
+  (defun +javascript|init-flycheck-eslint ()
+    "Favor local eslint over global installs and configure flycheck for eslint."
     (when (derived-mode-p 'js-mode)
-      (when-let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js"
-                                           (doom-project-root)))
-                 (exists-p (file-exists-p eslint))
-                 (executable-p (file-executable-p eslint)))
-        (setq-local flycheck-javascript-eslint-executable eslint))))
-  (add-hook 'flycheck-mode-hook #'+javascript|init-flycheck-elint)
+      (when-let ((exec-path (list (doom-project-expand "node_modules/.bin")))
+                 (eslint (executable-find "eslint")))
+        (setq-local flycheck-javascript-eslint-executable eslint))
+      (when (flycheck-find-checker-executable 'javascript-eslint)
+        ;; Flycheck has it's own trailing command and semicolon warning that was
+        ;; conflicting with the eslint settings.
+        (setq-local js2-strict-trailing-comma-warning nil)
+        (setq-local js2-strict-missing-semi-warning nil))))
+  (add-hook 'flycheck-mode-hook #'+javascript|init-flycheck-eslint)
 
   (map! :map js2-mode-map
         :localleader
@@ -81,7 +87,8 @@
       ("Split string"                    :exec js2r-split-string              :region nil)
       ("Unwrap"                          :exec js2r-unwrap                    :region t)
       ("Log this"                        :exec js2r-log-this)
-      ("Debug this"                      :exec js2r-debug-this))
+      ("Debug this"                      :exec js2r-debug-this)
+      ("Reformat buffer (eslint_d)"      :exec eslintd-fix :region nil :when (fboundp 'eslintd-fix)))
     :prompt "Refactor: "))
 
 
@@ -109,9 +116,8 @@
          (equal (file-name-extension buffer-file-name) "js")
          (re-search-forward "\\(^\\s-*import React\\|\\( from \\|require(\\)[\"']react\\)"
                             magic-mode-regexp-match-limit t)
-         (progn
-           (goto-char (match-beginning 1))
-           (not (sp-point-in-string-or-comment)))))
+         (progn (goto-char (match-beginning 1))
+                (not (sp-point-in-string-or-comment)))))
 
   (push (cons #'+javascript-jsx-file-p 'rjsx-mode) magic-mode-alist)
 
@@ -136,6 +142,10 @@
   :commands web-beautify-js
   :init
   (map! :map* (json-mode js2-mode-map) :n "gQ" #'web-beautify-js))
+
+
+(def-package! eslintd-fix
+  :commands (eslintd-fix-mode eslintd-fix))
 
 
 ;;
@@ -174,14 +184,27 @@
 ;;
 
 (def-project-mode! +javascript-screeps-mode
-  :match "/screeps/.+$"
+  :match "/screeps\\(-ai\\)?/.+$"
   :modes (+javascript-npm-mode)
-  :init (load! +screeps))
+  :add-hooks (+javascript|init-screeps-mode)
+  :on-load (load! +screeps))
 
 (def-project-mode! +javascript-gulp-mode
   :files "gulpfile.js")
 
 (def-project-mode! +javascript-npm-mode
   :modes (html-mode css-mode web-mode js2-mode markdown-mode)
-  :files "package.json")
+  :files "package.json"
+  :on-enter
+  (push (doom-project-expand "node_modules/.bin")
+        (if (make-local-variable 'exec-path)
+            exec-path)))
+
+
+;;
+;; Tools
+;;
+
+(def-project-mode! +javascript-eslintd-fix-mode
+  :add-hooks (eslintd-fix-mode))
 

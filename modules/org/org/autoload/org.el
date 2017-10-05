@@ -47,7 +47,7 @@ If on a:
          (context (org-element-context))
          (type (org-element-type context)))
     ;; skip over unimportant contexts
-    (while (and context (memq type '(verbatim code bold italic underline strike-through)))
+    (while (and context (memq type '(verbatim code bold italic underline strike-through subscript superscript)))
       (setq context (org-element-property :parent context)
             type (org-element-type context)))
     (pcase type
@@ -185,8 +185,10 @@ wrong places)."
                         (- (point) (line-beginning-position)))))
              (pcase direction
                ('below
-                (goto-char (line-end-position))
-                (insert (concat  "\n" (make-string pad ? ) marker)))
+                (org-end-of-item)
+                (goto-char (line-beginning-position))
+                (insert (make-string pad 32) (or marker ""))
+                (save-excursion (insert "\n")))
                ('above
                 (goto-char (line-beginning-position))
                 (insert (make-string pad 32) (or marker ""))
@@ -222,7 +224,6 @@ wrong places)."
                 (org-back-to-heading)
                 (org-insert-heading)
                 (when (= level 1)
-                  (save-excursion (evil-open-above 1))
                   (save-excursion (insert "\n")))))
              (when (org-element-property :todo-type context)
                (org-todo 'todo))))
@@ -281,3 +282,18 @@ with `org-cycle'). Also:
            (let ((window-beg (window-start)))
              (org-cycle)
              (set-window-start nil window-beg))))))
+
+;;;###autoload
+(defun +org/remove-link ()
+  "Unlink the text at point."
+  (interactive)
+  (unless (org-in-regexp org-bracket-link-regexp 1)
+    (user-error "No link at point"))
+  (save-excursion
+    (let ((remove (list (match-beginning 0) (match-end 0)))
+          (description (if (match-end 3)
+                           (org-match-string-no-properties 3)
+                         (org-match-string-no-properties 1))))
+      (apply #'delete-region remove)
+      (insert description))))
+
