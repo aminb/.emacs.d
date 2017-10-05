@@ -99,7 +99,16 @@ FILENAME defaults to `buffer-file-name'."
   (setq split-window-preferred-function
         #'visual-fill-column-split-window-sensibly))
 
-(remove-hook 'org-mode-hook #'visual-line-mode)
+(after! org-mode
+  (remove-hook 'org-mode-hook #'visual-line-mode))
+
+(after! web-mode
+  (defun my-web-mode-hook ()
+  "Hook for Web mode."
+  (setq web-mode-markup-indent-offset 1
+        web-mode-code-indent-offset 1
+        web-mode-css-indent-offset 1))
+  (add-hook 'web-mode-hook  'my-web-mode-hook))
 
 (setq tramp-default-method "ssh")
 
