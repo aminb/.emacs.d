@@ -110,6 +110,8 @@ FILENAME defaults to `buffer-file-name'."
         web-mode-css-indent-offset 1))
   (add-hook 'web-mode-hook  'my-web-mode-hook))
 
+(add-to-list 'magic-mode-alist '("<!doctype html>" . web-mode))
+
 (setq tramp-default-method "ssh")
 
 ;; (after! org
