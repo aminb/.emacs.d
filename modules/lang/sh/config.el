@@ -24,6 +24,11 @@
 
   (setq sh-indent-after-continuation 'always)
 
+  ;; recognize function names with dashes in them
+  (push '((sh . ((nil "^\\s-*function\\s-+\\([[:alpha:]_-][[:alnum:]_-]*\\)\\s-*\\(?:()\\)?" 1)
+                 (nil "^\\s-*\\([[:alpha:]_-][[:alnum:]_-]*\\)\\s-*()" 1))))
+        sh-imenu-generic-expression)
+
   ;; 1. Fontifies variables in double quotes
   ;; 2. Fontify command substitution in double quotes
   ;; 3. Fontify built-in/common commands (see `+sh-builtin-keywords')
@@ -32,7 +37,7 @@
                (1 'default prepend)
                (2 'font-lock-variable-name-face prepend))
               (+sh--match-command-subst-in-quotes
-               (0 'sh-quoted-exec prepend))
+               (1 'sh-quoted-exec prepend))
               (,(regexp-opt +sh-builtin-keywords 'words)
                (0 'font-lock-builtin-face append))))
 
