@@ -5,6 +5,7 @@
 ;;   doom-...   public variables or non-interactive functions
 ;;   doom--...  private anything (non-interactive), not safe for direct use
 ;;   doom/...   an interactive function; safe for M-x or keybinding
+;;   doom//...  an interactive function for managing/maintaining Doom itself
 ;;   doom:...   an evil operator, motion or command
 ;;   doom|...   hook function
 ;;   doom*...   advising functions
@@ -105,6 +106,7 @@ melodramatic ex-vimmer disappointed with the text-editor status quo."
  auto-save-list-file-name     (concat doom-cache-dir "autosave")
  backup-directory-alist       (list (cons "." (concat doom-cache-dir "backup/")))
  pcache-directory             (concat doom-cache-dir "pcache/")
+ mc/list-file                 (concat doom-etc-dir "mc-lists.el")
  server-auth-dir              (concat doom-cache-dir "server/")
  shared-game-score-directory  (concat doom-etc-dir "shared-game-score/")
  tramp-auto-save-directory    (concat doom-cache-dir "tramp-auto-save/")
@@ -160,7 +162,8 @@ ability to invoke the debugger in debug mode."
   ;; reset it to a reasonable default.
   (setq gc-cons-threshold 16777216
         gc-cons-percentage 0.1
-        file-name-handler-alist doom--file-name-handler-alist))
+        file-name-handler-alist doom--file-name-handler-alist)
+  t)
 
 
 ;;;
