@@ -7,8 +7,7 @@ command line args following a double dash (each arg should be in the
 'module/submodule' format).
 
 If neither is available, run all tests in all enabled modules."
-  (interactive) ; must be interactive to be run from batch
-  ;; FIXME Refactor this
+  (interactive)
   (condition-case-unless-debug ex
       (let (targets)
         ;; ensure DOOM is initialized
@@ -41,7 +40,7 @@ If neither is available, run all tests in all enabled modules."
                (let ((noninteractive t)
                      doom-modules)
                  (load (expand-file-name "init.test.el" user-emacs-directory) nil t)
-                 (setq modules (doom--module-pairs)
+                 (setq modules (doom-module-pairs)
                        targets (list (expand-file-name "test/" doom-core-dir))))))
         ;; resolve targets to a list of test files and load them
         (cl-loop with targets =

@@ -71,7 +71,8 @@ If on a:
        (goto-char (org-element-property :post-affiliated context))
        (call-interactively #'org-footnote-action))
 
-      ((or `planning `timestamp) (org-follow-timestamp-link))
+      ((or `planning `timestamp)
+       (org-follow-timestamp-link))
 
       ((or `table `table-row)
        (if (org-at-TBLFM-p)
@@ -269,7 +270,7 @@ with `org-cycle'). Also:
   (interactive)
   (save-excursion
     (org-beginning-of-line)
-    (cond ((org-table-p)
+    (cond ((org-at-table-p)
            (org-table-align))
           ((org-in-src-block-p)
            (org-babel-remove-result))
