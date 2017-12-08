@@ -65,13 +65,14 @@ FILENAME defaults to `buffer-file-name'."
        (file-name-nondirectory (or filename (buffer-file-name))))))
 
   ;; Recompile with latexmk -xelatex on save
-  (add-hook 'after-save-hook
-            (lambda ()
-              (when (string= major-mode 'latex-mode)
-                (TeX-run-latexmk
-                 "LaTeX"
-                 (format "latexmk -xelatex %s" (buffer-file-name))
-                 (file-name-base (buffer-file-name)))))))
+  ;; (add-hook 'after-save-hook
+  ;;           (lambda ()
+  ;;             (when (string= major-mode 'latex-mode)
+  ;;               (TeX-run-latexmk
+  ;;                "LaTeX"
+  ;;                (format "latexmk -xelatex %s" (buffer-file-name))
+  ;;                (file-name-base (buffer-file-name))))))
+  )
 
 (def-package! ripgrep
   :commands ripgrep-regexp)
@@ -113,6 +114,17 @@ FILENAME defaults to `buffer-file-name'."
 (add-to-list 'magic-mode-alist '("<!doctype html>" . web-mode))
 
 (setq tramp-default-method "ssh")
+
+(defun haskell-style ()
+  "Sets the current buffer to use Haskell Style. Meant to be
+  added to `haskell-mode-hook'"
+  (interactive)
+  (setq tab-width 2
+        haskell-indentation-layout-offset 2
+        haskell-indentation-left-offset 2
+        haskell-indentation-ifte-offset 2))
+
+(add-hook 'haskell-mode-hook 'haskell-style)
 
 ;; (after! org
 ;;   (setq-default org-indent-indentation-per-level 4))
