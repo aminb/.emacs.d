@@ -1,4 +1,5 @@
-;;; org/org-attach/autoload/org-attach.el -*- lexical-binding: t; -*-
+;;; lang/org/autoload/org-attach.el -*- lexical-binding: t; -*-
+;;;###if (featurep! +attach)
 
 (defun +org-attach--icon (path)
   (char-to-string
@@ -34,8 +35,8 @@
 ;;           (goto-char (point-min))
 ;;           (while (progn (org-next-link) (not org-link-search-failed))
 ;;             (setq element (org-element-context))
-;;             (when-let (file (and (eq (org-element-type element) 'link)
-;;                                  (expand-file-name (org-element-property :path element))))
+;;             (when-let* (file (and (eq (org-element-type element) 'link)
+;;                                   (expand-file-name (org-element-property :path element))))
 ;;               (when (and (string= (org-element-property :type element) "file")
 ;;                          (string= (concat (file-name-base (directory-file-name (file-name-directory file))) "/")
 ;;                                   org-attach-directory)

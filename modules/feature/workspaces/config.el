@@ -22,7 +22,6 @@ renamed.")
 ;;
 
 (def-package! persp-mode
-  :demand t
   :config
   (setq persp-autokill-buffer-on-remove 'kill-weak
         persp-nil-name "nil"
@@ -92,7 +91,19 @@ Allows a perspective-specific buffer list via `+workspaces-buffer-list'."
                (not persp-temporarily-display-buffer)
                (doom-real-buffer-p buffer))
       (persp-add-buffer buffer (get-current-persp) nil)
-      (redisplay)))
+      (force-mode-line-update t)))
   (advice-add #'switch-to-buffer :after #'+workspaces*auto-add-buffer)
-  (advice-add #'display-buffer   :after #'+workspaces*auto-add-buffer))
+  (advice-add #'display-buffer   :after #'+workspaces*auto-add-buffer)
+
+  ;;
+  (after! ivy
+    (nconc ivy-sort-functions-alist
+           '((persp-kill-buffer   . nil)
+             (persp-remove-buffer . nil)
+             (persp-add-buffer    . nil)
+             (persp-switch        . nil)
+             (persp-window-switch . nil)
+             (persp-frame-switch  . nil)
+             (+workspace/switch-to . nil)
+             (+workspace/delete . nil)))))
 
