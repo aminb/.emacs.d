@@ -59,6 +59,7 @@
       ;unicode           ; extended unicode support for various languages
       ;tabbar            ; FIXME an (incomplete) tab bar for Emacs
        vi-tilde-fringe   ; fringe tildes to mark beyond EOB
+       (window-select +ace-window)  ; visually switch windows
 
        :tools
        dired             ; making dired pretty [functional]
@@ -80,6 +81,7 @@
       ;assembly          ; assembly for fun or debugging
        cc                ; C/C++/Obj-C madness
       ;crystal           ; ruby at the speed of c
+      ;clojure           ; java with a lisp
       ;csharp            ; unity, .NET, and mono shenanigans
        data              ; config/data formats
       ;elixir            ; erlang done right
@@ -96,6 +98,14 @@
       ;lua               ; one-based indices? one-based indices
        markdown          ; writing docs for people to ignore
       ;ocaml             ; an objective camel
+       (org              ; organize your plain life in plain text
+        +attach          ; custom attachment system
+        +babel           ; running code in org
+        +capture         ; org-capture in and outside of Emacs
+        +export          ; centralized export system + more backends
+        +present         ; Emacs for presentations
+        ;; TODO +publish
+        )
       ;perl              ; write code no one else can comprehend
       ;php               ; make php less awful to work with
        plantuml          ; diagrams for confusing people more
@@ -109,17 +119,6 @@
       ;swift             ; who asked for emoji variables?
       ;typescript        ; javascript, but better
        web               ; the tubes
-
-       :org
-       org               ; organize your plain life in plain text
-       org-babel         ; executable code snippets in org-mode
-       org-attach        ; a simpler attachment system
-       org-capture       ; a better org-capture, in or outside of Emacs
-       org-export        ; a custom, centralized export system
-       org-notebook      ; org-mode as a notebook
-       org-present       ; using org-mode for presentations
-      ;org-sync          ; TODO sync with mobile
-      ;org-publish       ; TODO org + blogs
 
        ;; Applications are complex and opinionated modules that transform Emacs
        ;; toward a specific purpose. They may have additional dependencies and
