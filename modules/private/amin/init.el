@@ -7,7 +7,7 @@
 (setq user-mail-address "amin@aminb.org"
       user-full-name    "Amin Bandali")
 
-(setq +doom-modeline-height 32 ;; 36
+(setq +doom-modeline-height 36 ;; 32
       doom-font (font-spec :family "Iosevka" :size 16)
       doom-variable-pitch-font (font-spec :family "Concourse T4" :size 15)
       doom-unicode-font (font-spec :family "DejaVu Sans Mono" :size 12)
