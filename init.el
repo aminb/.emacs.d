@@ -136,5 +136,6 @@
        hlissner
        amin
        haskell
+       lean
        notmuch)
 
