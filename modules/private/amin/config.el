@@ -129,6 +129,11 @@ FILENAME defaults to `buffer-file-name'."
 ;; (after! org
 ;;   (setq-default org-indent-indentation-per-level 4))
 
+(def-package! exec-path-from-shell
+  :config
+  (exec-path-from-shell-copy-env "SSH_AGENT_PID")
+  (exec-path-from-shell-copy-env "SSH_AUTH_SOCK"))
+
 ;; (require 'gruvbox-theme)
 ;; (require 'gruvbox-light-hard-theme)
 ;; (require 'gruvbox-dark-medium-theme)
