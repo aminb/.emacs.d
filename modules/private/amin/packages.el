@@ -7,10 +7,6 @@
 ;; (package! tao-theme)
 ;; (package! flatui-theme)
 
-(package! ag)
-(package! ripgrep)
-(package! projectile-ripgrep)
-
 (package! visual-fill-column)
 
 (package! exec-path-from-shell)

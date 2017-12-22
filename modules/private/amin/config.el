@@ -39,13 +39,6 @@ FILENAME defaults to `buffer-file-name'."
   ;;                (file-name-base (buffer-file-name))))))
   )
 
-(def-package! ripgrep
-  :commands ripgrep-regexp)
-
-(def-package! projectile-ripgrep
-  :after projectile
-  :commands projectile-ripgrep)
-
 (after! dumb-jump
   (setq dumb-jump-force-searcher 'rg))
 
@@ -104,6 +97,9 @@ FILENAME defaults to `buffer-file-name'."
   :config
   (exec-path-from-shell-copy-env "SSH_AGENT_PID")
   (exec-path-from-shell-copy-env "SSH_AUTH_SOCK"))
+
+(after! ivy
+  (setq ivy-magic-slash-non-match-action 'ivy-magic-slash-non-match-cd-selected))
 
 ;; (require 'gruvbox-theme)
 ;; (require 'gruvbox-light-hard-theme)
