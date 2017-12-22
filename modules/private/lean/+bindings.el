@@ -1,3 +1,3 @@
 ;;; private/lean/+bindings.el -*- lexical-binding: t; -*-
 
-(map! "S-SPC" #'company-complete)
+;; (map! "S-M-SPC" #'company-complete)
