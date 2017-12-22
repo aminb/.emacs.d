@@ -56,7 +56,7 @@
        hl-todo           ; highlight TODO/FIXME/NOTE tags
        nav-flash         ; blink the current line after jumping
        evil-goggles      ; display visual hints when editing in evil
-      ;unicode           ; extended unicode support for various languages
+       unicode           ; extended unicode support for various languages
       ;tabbar            ; FIXME an (incomplete) tab bar for Emacs
        vi-tilde-fringe   ; fringe tildes to mark beyond EOB
        (window-select +ace-window)  ; visually switch windows
