@@ -4,6 +4,10 @@
 ;; core but before any module is activated, giving you an opportunity to
 ;; overwrite variables or settings before initialization.
 
+;; An extra measure to prevent the flash of unstyled mode-line while Emacs is
+;; booting up (when Doom is byte-compiled).
+(setq-default mode-line-format nil)
+
 (setq user-mail-address "amin@aminb.org"
       user-full-name    "Amin Bandali")
 
@@ -19,6 +23,7 @@
       doom-theme 'doom-one-light
       text-scale-mode-step 1.05
       ;; +doom-modeline-buffer-file-name-style 'file-name
+      org-ellipsis "  "
       )
 
 (setq-default fill-column 80

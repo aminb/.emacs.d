@@ -2,40 +2,11 @@
 
 (setq auth-sources (list "~/.authinfo.gpg" ))
 
-(map!
- "C-s" #'swiper
- "C-S-l" #'recenter
- "C-x C-b" #'ibuffer
- [C-S-return] #'recompile
- :n "gl" #'recenter
- :n "/" #'swiper
- ;; "C-=" #'count-words-region
- (:leader
-   :n "cq" #'fill-paragraph
-   :n "ca" #'auto-fill-mode
-   :n "cc" #'count-words-region
-   )
- (:leader
-   :desc "dashboard" :n "d" #'+doom-dashboard/open
-   :desc "Centered Window Mode" :n "C" #'centered-window-mode
-   (:desc "Dumb Jump" :prefix "j"
-     :desc "Go" :n "j" #'dumb-jump-go
-     :desc "Back" :n "k" #'dumb-jump-back)))
+(remove-hook! (prog-mode text-mode conf-mode) #'doom|enable-line-numbers)
 
-;; (after! evil-escape
-;;   ;; Change the evil escape sequence to fd instead of jk
-;;   (setq evil-escape-key-sequence "fd"))
+(load! +bindings)
 
-(after! dumb-jump
-  (setq dumb-jump-force-searcher 'rg))
-
-(map! :map emmet-mode-keymap
-      :i [C-return] #'emmet-expand-yas)
-
-(def-package! magit-svn
-  :after magit)
-
-(setq TeX-PDF-mode t                  ; use pdflatex instead of latex
+(setq TeX-PDF-mode t          ; use pdflatex instead of latex
       TeX-engine 'xetex)
 
 ;; Support zathura in TeX mode
@@ -45,14 +16,8 @@
         (output-dvi "xdvi")
         (output-pdf "Zathura")
         (output-html "xdg-open")))
-;; (setq TeX-view-program-list
-;;       '(("zathura"
-;;          ("zathura" (mode-io-correlate "-sync.sh")
-;;           " "
-;;           (mode-io-correlate "%n:1:%t ")
-;;           "%o"))))
 
-(def-package! auctex-latexmk             ; latexmk command for AUCTeX
+(def-package! auctex-latexmk  ; latexmk command for AUCTeX
   :after latex
   :config
   (auctex-latexmk-setup)
@@ -81,27 +46,33 @@ FILENAME defaults to `buffer-file-name'."
   :after projectile
   :commands projectile-ripgrep)
 
-;; (def-package! visual-fill-column
-;;   :init
-;;   (dolist (hook '(prog-mode-hook
-;;                   text-mode-hook
-;;                   ;; notmuch-show-hook
-;;                   ;; haskell-cabal-mode-hook
-;;                   ))
-;;     (add-hook hook #'visual-fill-column-mode))
-;;   :config
-;;   ;; Center text by default and move the fringes close to the text.
-;;   (setq-default visual-fill-column-center-text t
-;;                 visual-fill-column-fringes-outside-margins nil
-;;                 ;; take into account the line numbers in Emacs 26
-;;                 visual-fill-column-width (+ fill-column 6))
-;;   ;; Split windows vertically despite large margins, because Emacs otherwise
-;;   ;; refuses to vertically split windows with large margins
-;;   (setq split-window-preferred-function
-;;         #'visual-fill-column-split-window-sensibly))
+(after! dumb-jump
+  (setq dumb-jump-force-searcher 'rg))
+
+(def-package! visual-fill-column
+  :init
+  (dolist (hook '(prog-mode-hook
+                  text-mode-hook
+                  ;; notmuch-show-hook
+                  ;; haskell-cabal-mode-hook
+                  ))
+    (add-hook hook #'visual-fill-column-mode))
+  :config
+  ;; Center text by default and move the fringes close to the text.
+  (setq-default visual-fill-column-center-text t
+                visual-fill-column-fringes-outside-margins nil
+                ;; take into account the line numbers in Emacs 26
+                visual-fill-column-width (+ fill-column 6))
+  ;; Split windows vertically despite large margins, because Emacs otherwise
+  ;; refuses to vertically split windows with large margins
+  (setq split-window-preferred-function
+        #'visual-fill-column-split-window-sensibly))
 
 (after! org-mode
   (remove-hook 'org-mode-hook #'visual-line-mode))
+
+;; (after! org
+;;   (setq-default org-indent-indentation-per-level 4))
 
 (after! web-mode
   (defun my-web-mode-hook ()
@@ -125,9 +96,6 @@ FILENAME defaults to `buffer-file-name'."
         haskell-indentation-ifte-offset 2))
 
 (add-hook 'haskell-mode-hook 'haskell-style)
-
-;; (after! org
-;;   (setq-default org-indent-indentation-per-level 4))
 
 (def-package! exec-path-from-shell
   :defer 1
