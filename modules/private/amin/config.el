@@ -101,6 +101,9 @@ FILENAME defaults to `buffer-file-name'."
 (after! ivy
   (setq ivy-magic-slash-non-match-action 'ivy-magic-slash-non-match-cd-selected))
 
+(def-package! page-break-lines
+  :config (global-page-break-lines-mode))
+
 ;; (require 'gruvbox-theme)
 ;; (require 'gruvbox-light-hard-theme)
 ;; (require 'gruvbox-dark-medium-theme)

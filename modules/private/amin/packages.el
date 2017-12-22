@@ -10,3 +10,5 @@
 (package! visual-fill-column)
 
 (package! exec-path-from-shell)
+
+(package! page-break-lines)
