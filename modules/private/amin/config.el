@@ -130,6 +130,9 @@ FILENAME defaults to `buffer-file-name'."
 ;;   (setq-default org-indent-indentation-per-level 4))
 
 (def-package! exec-path-from-shell
+  :defer 1
+  :init
+  (setq exec-path-from-shell-check-startup-files nil)
   :config
   (exec-path-from-shell-copy-env "SSH_AGENT_PID")
   (exec-path-from-shell-copy-env "SSH_AUTH_SOCK"))

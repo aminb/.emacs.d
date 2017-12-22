@@ -8,4 +8,4 @@
   (notmuch))
 
 (map!
- :leader :desc "notmuch" :n "M" #'aminb-notmuch)
+ :leader :desc "notmuch" :n "m" #'aminb-notmuch)
