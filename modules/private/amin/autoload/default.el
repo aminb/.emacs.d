@@ -23,25 +23,25 @@
        (doom-project-find-file ,dir))))
 
 
-;;;###autoload (autoload '+default/browse-project "private/amin/autoload/default" nil t)
-(+default--def-browse-in! project (doom-project-root))
+;; ;;;###autoload (autoload '+default/browse-project "private/amin/autoload/default" nil t)
+;; (+default--def-browse-in! project (doom-project-root))
 
-;;;###autoload (autoload '+default/find-in-templates "private/amin/autoload/default" nil t)
-(+default--def-find-in!   templates +file-templates-dir)
-;;;###autoload (autoload '+default/browse-templates "private/amin/autoload/default" nil t)
-(+default--def-browse-in! templates +file-templates-dir)
+;; ;;;###autoload (autoload '+default/find-in-templates "private/amin/autoload/default" nil t)
+;; (+default--def-find-in!   templates +file-templates-dir)
+;; ;;;###autoload (autoload '+default/browse-templates "private/amin/autoload/default" nil t)
+;; (+default--def-browse-in! templates +file-templates-dir)
 
-;;;###autoload (autoload '+default/find-in-emacsd "private/amin/autoload/default" nil t)
-(+default--def-find-in!   emacsd doom-emacs-dir)
-;;;###autoload (autoload '+default/browse-emacsd "private/amin/autoload/default" nil t)
-(+default--def-browse-in! emacsd doom-emacs-dir)
+;; ;;;###autoload (autoload '+default/find-in-emacsd "private/amin/autoload/default" nil t)
+;; (+default--def-find-in!   emacsd doom-emacs-dir)
+;; ;;;###autoload (autoload '+default/browse-emacsd "private/amin/autoload/default" nil t)
+;; (+default--def-browse-in! emacsd doom-emacs-dir)
 
-;;;###autoload (autoload '+default/find-in-notes "private/amin/autoload/default" nil t)
-(+default--def-find-in!   notes +org-dir)
-;;;###autoload (autoload '+default/browse-notes "private/amin/autoload/default" nil t)
-(+default--def-browse-in! notes +org-dir)
+;; ;;;###autoload (autoload '+default/find-in-notes "private/amin/autoload/default" nil t)
+;; (+default--def-find-in!   notes +org-dir)
+;; ;;;###autoload (autoload '+default/browse-notes "private/amin/autoload/default" nil t)
+;; (+default--def-browse-in! notes +org-dir)
 
-;;;###autoload (autoload '+default/find-in-snippets "private/amin/autoload/default" nil t)
-(+default--def-find-in! snippets +amin-snippets-dir)
-;; NOTE No need for a browse-snippets variant, use `yas-visit-snippet-file'
+;; ;;;###autoload (autoload '+default/find-in-snippets "private/amin/autoload/default" nil t)
+;; (+default--def-find-in! snippets +amin-snippets-dir)
+;; ;; NOTE No need for a browse-snippets variant, use `yas-visit-snippet-file'
 
