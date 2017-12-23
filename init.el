@@ -136,7 +136,7 @@
        ;; scheme and additional ex commands for evil-mode. Use it as a reference
        ;; for your own.
        :private
-      ;default
+       default
        amin
        lean
        notmuch)

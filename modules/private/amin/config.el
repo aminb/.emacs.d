@@ -1,12 +1,5 @@
 ;;; private/amin/config.el -*- lexical-binding: t; -*-
 
-(def-package! emacs-snippets)
-
-(load! +bindings)    ; keybindings
-(when (featurep 'evil)
-  (load! +commands)) ; custom ex commands for `evil-mode'
-
-
 ;;
 ;; Global config
 ;;
@@ -22,6 +15,62 @@
   (let ((auth-sources (if (equal tramp-current-method "sudo") nil auth-sources)))
     (apply orig-fn args)))
 (advice-add #'tramp-read-passwd :around #'+hlissner*no-authinfo-for-tramp)
+
+
+;;
+;; Keybindings
+;;
+
+(map!
+ :ne "M-b" #'backward-word
+ :ne "M-f" #'forward-word
+ :ne "M-q" #'fill-paragraph
+
+ "C-s"        #'swiper
+ "C-S-l"      #'recenter
+ "C-x C-b"    #'ibuffer
+ [C-S-return] #'recompile
+ :n "gl"      #'recenter
+ :n "/"       #'swiper
+
+ :desc "Dashboard" :n "d" #'+doom-dashboard/open
+ :desc "Centered"  :n "C" #'centered-window-mode
+
+ (:desc "git" :prefix "g"
+   :desc "Git status"          :n "SPC" #'magit-status
+   :desc "Git status (prefix)" :n "S"   #'prefix-magit-status
+   :desc "Git blame"           :n "B"   #'magit-blame
+   :desc "Git fetch"           :n "f"   #'magit-fetch
+   :desc "Git pull"            :n "F"   #'magit-pull
+   :desc "Git push"            :n "P"   #'magit-push
+   ;; :desc "Git commit"          :n "cc"  #'magit-commit
+   ;; :desc "Git commit (amend)"  :n "ca"  #'magit-commit-amend
+   :desc "Git checkout"        :n "bb"  #'magit-checkout
+   :desc "Git branch"          :n "bc"  #'magt-branch)
+
+ ;; (:desc "project" :prefix "p"
+ ;;   :desc "Search project with rg" :n "SPC" #'counsel-projectile-rg)
+
+ (:desc "dumb-jump" :prefix "j"
+   :desc "Go"   :n "j" #'dumb-jump-go
+   :desc "Back" :n "k" #'dumb-jump-back)
+
+ ;; (:desc "app" :prefix "a"
+ ;;   (:desc "shell" :prefix "s"
+ ;;     :desc "eshell"     :n "e" #'+eshell:run
+ ;;     :desc "multi-term" :n "m" #'multi-term))
+
+ ;; :n "cq" #'fill-paragraph
+ ;; :n "ca" #'auto-fill-mode
+ ;; :n "cc" #'count-words-region
+
+ (:after ivy
+   :map ivy-minibuffer-map
+   "TAB" #'ivy-partial-or-done)
+
+ (:after emmet
+   (:map emmet-mode-keymap
+     :i [C-return] #'emmet-expand-yas)))
 
 
 ;;
@@ -49,15 +98,6 @@
     (add-hook 'evil-insert-state-entry-hook #'evil-mc-resume-cursors nil t))
   (add-hook! 'evil-mc-after-cursors-deleted
     (remove-hook 'evil-insert-state-entry-hook #'evil-mc-resume-cursors t)))
-
-;; feature/snippets
-(defvar +amin-dir (file-name-directory load-file-name))
-(defvar +amin-snippets-dir (expand-file-name "snippets/" +amin-dir))
-(after! yasnippet
-  ;; Don't use default snippets, use mine
-  (setq yas-snippet-dirs
-        (append (list '+amin-snippets-dir)
-                (delq 'yas-installed-snippets-dir yas-snippet-dirs))))
 
 ;; completion/helm
 (after! helm
