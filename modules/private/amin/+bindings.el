@@ -200,6 +200,7 @@
      :desc "Git revert hunk"       :n  "r"  #'git-gutter:revert-hunk
      :desc "Git revert buffer"     :n  "R"  #'vc-revert
      :desc "Git fetch"             :n  "f"  #'magit-fetch
+     :desc "Git pull"              :n  "F"  #'magit-pull
      :desc "Git push"              :n  "p"  #'magit-push
      :desc "Git commit"            :n  "cc" #'magit-commit
      :desc "Git commit amend"      :n  "ca" #'magit-commit-amend
@@ -310,6 +311,11 @@
    (:desc "Dumb Jump" :prefix "j"
      :desc "Go"   :n "j" #'dumb-jump-go
      :desc "Back" :n "k" #'dumb-jump-back)
+
+   (:desc "app" :prefix "a"
+     (:desc "shell" :prefix "s"
+       :desc "Eshell"     :n "e" #'+eshell:run
+       :desc "multi-term" :n "m" #'multi-term))
 
    :n "cq" #'fill-paragraph
    :n "ca" #'auto-fill-mode

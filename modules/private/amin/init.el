@@ -15,11 +15,6 @@
       doom-font (font-spec :family "Hack" :size 14)
       doom-variable-pitch-font (font-spec :family "Concourse T4" :size 15)
       doom-unicode-font (font-spec :family "Hack" :size 14)
-      ;; doom-theme 'gruvbox-dark-medium
-      ;; doom-theme 'gruvbox-light-hard
-      ;; doom-theme 'tao-yang
-      ;; doom-theme 'tao-yin
-      ;; doom-theme 'flatui
       doom-theme 'doom-one-light
       text-scale-mode-step 1.05
       org-ellipsis "  "
