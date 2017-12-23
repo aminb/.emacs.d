@@ -133,7 +133,7 @@
        ;; This is the private module of Doom's maintainer; use it as a reference
        ;; for your own.
        :private
-       hlissner
+      ;hlissner
        amin
        haskell
        lean

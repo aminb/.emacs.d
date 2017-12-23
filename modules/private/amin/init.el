@@ -22,7 +22,6 @@
       ;; doom-theme 'flatui
       doom-theme 'doom-one-light
       text-scale-mode-step 1.05
-      ;; +doom-modeline-buffer-file-name-style 'file-name
       org-ellipsis "  "
       )
 
