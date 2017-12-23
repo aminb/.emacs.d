@@ -1,7 +1,10 @@
 ;;; private/amin/config.el -*- lexical-binding: t; -*-
 
-(load! +bindings) ; my key bindings
-(load! +commands) ; my custom ex commands (with much inspiration from hlissner)
+(def-package! emacs-snippets)
+
+(load! +bindings)    ; keybindings
+(when (featurep 'evil)
+  (load! +commands)) ; custom ex commands for `evil-mode'
 
 
 ;;

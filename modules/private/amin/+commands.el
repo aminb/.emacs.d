@@ -44,8 +44,8 @@
 ;; Dealing with buffers
 (ex! "clean[up]"   #'doom/cleanup-buffers)
 (ex! "k[ill]"      #'doom/kill-this-buffer)
-(ex! "k[ill]all"   #'+hlissner:kill-all-buffers)
-(ex! "k[ill]m"     #'+hlissner:kill-matching-buffers)
+(ex! "k[ill]all"   #'+default:kill-all-buffers)
+(ex! "k[ill]m"     #'+default:kill-matching-buffers)
 (ex! "k[ill]o"     #'doom/kill-other-buffers)
 (ex! "l[ast]"      #'doom/popup-restore)
 (ex! "m[sg]"       #'view-echo-area-messages)
@@ -53,7 +53,7 @@
 
 ;; Project navigation
 (ex! "a"           #'projectile-find-other-file)
-(ex! "cd"          #'+hlissner:cd)
+(ex! "cd"          #'+default:cd)
 (cond ((featurep! :completion ivy)
        (ex! "ag"       #'+ivy:ag)
        (ex! "agc[wd]"  #'+ivy:ag-cwd)

@@ -13,16 +13,17 @@
 (map!
  [remap evil-jump-to-tag] #'projectile-find-tag
  [remap find-tag]         #'projectile-find-tag
- ;; ensure there are no conflicts
- :nmvo doom-leader-key nil
- :nmvo doom-localleader-key nil)
 
-(map!
+ ;; Ensure there are no conflicts
+ :nmvo doom-leader-key nil
+ :nmvo doom-localleader-key nil
+
  ;; --- Global keybindings ---------------------------
  ;; Make M-x available everywhere
  :gnvime "M-x" #'execute-extended-command
  :gnvime "A-x" #'execute-extended-command
- ;; Emacs debug utilities
+
+ ;; A little sandbox to run code in
  :gnvime "M-;" #'eval-expression
  :gnvime "M-:" #'doom/open-scratch-buffer
  ;; Text-scaling
@@ -58,8 +59,8 @@
  ;; :ne "M-f"   #'swiper
  :ne "C-M-f" #'doom/toggle-fullscreen
  :n  "M-s"   #'save-buffer
- :m  "A-j"   #'+hlissner:multi-next-line
- :m  "A-k"   #'+hlissner:multi-previous-line
+ :m  "A-j"   #'+default:multi-next-line
+ :m  "A-k"   #'+default:multi-previous-line
  :nv "C-SPC" #'+evil:fold-toggle
  :gnvimer "M-v" #'clipboard-yank
  ;; Easier window navigation
@@ -184,13 +185,13 @@
      :desc "Find file from here"       :n "?" #'counsel-file-jump
      :desc "Find other file"           :n "a" #'projectile-find-other-file
      :desc "Open project editorconfig" :n "c" #'editorconfig-find-current-editorconfig
-     :desc "Find file in dotfiles"     :n "d" #'+hlissner/find-in-dotfiles
-     :desc "Browse dotfiles"           :n "D" #'+hlissner/browse-dotfiles
-     :desc "Find file in emacs.d"      :n "e" #'+hlissner/find-in-emacsd
-     :desc "Browse emacs.d"            :n "E" #'+hlissner/browse-emacsd
+     :desc "Find file in dotfiles"     :n "d" #'+default/find-in-dotfiles
+     :desc "Browse dotfiles"           :n "D" #'+default/browse-dotfiles
+     :desc "Find file in emacs.d"      :n "e" #'+default/find-in-emacsd
+     :desc "Browse emacs.d"            :n "E" #'+default/browse-emacsd
      :desc "Recent files"              :n "r" #'recentf-open-files
      :desc "Recent project files"      :n "R" #'projectile-recentf
-     :desc "Yank filename"             :n "y" #'+hlissner/yank-buffer-filename)
+     :desc "Yank filename"             :n "y" #'+default/yank-buffer-filename)
 
    (:desc "git" :prefix "g"
      :desc "Git status"            :n  "SS" #'magit-status
@@ -239,8 +240,8 @@
      :desc "From snippet"          :nv "s" #'yas-insert-snippet)
 
    (:desc "notes" :prefix "n"
-     :desc "Find file in notes"    :n  "n" #'+hlissner/find-in-notes
-     :desc "Browse notes"          :n  "N" #'+hlissner/browse-notes
+     :desc "Find file in notes"    :n  "n" #'+default/find-in-notes
+     :desc "Browse notes"          :n  "N" #'+default/browse-notes
      :desc "Org capture"           :n  "x" #'+org-capture/open
      :desc "Browse mode notes"     :n  "m" #'+org/browse-notes-for-major-mode
      :desc "Browse project notes"  :n  "p" #'+org/browse-notes-for-project)
@@ -270,7 +271,7 @@
        :desc "Send project to Launchbar" :n "L" #'+macos/send-project-to-launchbar))
 
    (:desc "project" :prefix "p"
-     :desc "Browse project"          :n  "."   (find-file-in! (doom-project-root))
+     :desc "Browse project"          :n  "."   #'+default/browse-project
      :desc "Find file in project"    :n  "/"   #'projectile-find-file
      :desc "Search project with rg"  :n  "SPC" #'counsel-projectile-rg
      :desc "Run cmd in project root" :nv "!"   #'projectile-run-shell-command-in-root
@@ -296,7 +297,7 @@
      :desc "New snippet"            :n  "n" #'yas-new-snippet
      :desc "Insert snippet"         :nv "i" #'yas-insert-snippet
      :desc "Find snippet for mode"  :n  "s" #'yas-visit-snippet-file
-     :desc "Find snippet"           :n  "S" #'+hlissner/find-in-snippets)
+     :desc "Find snippet"           :n  "S" #'+default/find-in-snippets)
 
    (:desc "toggle" :prefix "t"
      :desc "Flyspell"               :n "s" #'flyspell-mode
@@ -700,7 +701,11 @@
    :n "RET" #'vc-annotate-find-revision-at-line))
 
 
-;; --- Custom key functionality ---------------------
+;;
+;; Custom functionality
+;;
+
+;; Fix ;/, as repeat-keys in evil-mode, without overriding ;/, bindings
 (defmacro do-repeat! (command next-func prev-func)
   "Repeat motions with ;/,"
   (let ((fn-sym (intern (format "+evil*repeat-%s" command))))
@@ -737,7 +742,6 @@
   (do-repeat! evil-visualstar/begin-search-backward
     evil-ex-search-previous evil-ex-search-next))
 
-;; evil-easymotion
 (after! evil-easymotion
   (let ((prefix (concat doom-leader-key " /")))
     ;; NOTE `evilem-default-keybinds' unsets all other keys on the prefix (in
