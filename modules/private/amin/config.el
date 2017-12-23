@@ -33,36 +33,38 @@
  :n "gl"      #'recenter
  :n "/"       #'swiper
 
- :desc "Dashboard" :n "d" #'+doom-dashboard/open
- :desc "Centered"  :n "C" #'centered-window-mode
+ (:leader
+   :desc "Dashboard" :n "d" #'+doom-dashboard/open
+   :desc "Centered"  :n "C" #'centered-window-mode
 
- (:desc "git" :prefix "g"
-   :desc "Git status"          :n "SPC" #'magit-status
-   :desc "Git status (prefix)" :n "S"   #'prefix-magit-status
-   :desc "Git blame"           :n "B"   #'magit-blame
-   :desc "Git fetch"           :n "f"   #'magit-fetch
-   :desc "Git pull"            :n "F"   #'magit-pull
-   :desc "Git push"            :n "P"   #'magit-push
-   ;; :desc "Git commit"          :n "cc"  #'magit-commit
-   ;; :desc "Git commit (amend)"  :n "ca"  #'magit-commit-amend
-   :desc "Git checkout"        :n "bb"  #'magit-checkout
-   :desc "Git branch"          :n "bc"  #'magt-branch)
+   (:desc "git" :prefix "g"
+     :desc "Git status"          :n "SPC" #'magit-status
+     :desc "Git status (prefix)" :n "S"   #'prefix-magit-status
+     :desc "Git fetch"           :n "f"   #'magit-fetch
+     :desc "Git pull"            :n "F"   #'magit-pull
+     :desc "Git push"            :n "P"   #'magit-push
+     (:desc "Git commit" :prefix "c"
+       :desc "commit" :n "c" #'magit-commit
+       :desc "amend"  :n "a" #'magit-commit-amend)
+     (:desc "Git branch" :prefix "B"
+       :desc "checkout" :n "b" #'magit-checkout
+       :desc "create"   :n "c" #'magit-branch))
 
- ;; (:desc "project" :prefix "p"
- ;;   :desc "Search project with rg" :n "SPC" #'counsel-projectile-rg)
+   (:desc "project" :prefix "p"
+     :desc "Search project with rg" :n "SPC" #'counsel-projectile-rg)
 
- (:desc "dumb-jump" :prefix "j"
-   :desc "Go"   :n "j" #'dumb-jump-go
-   :desc "Back" :n "k" #'dumb-jump-back)
+   (:desc "dumb-jump" :prefix "j"
+     :desc "Go"   :n "j" #'dumb-jump-go
+     :desc "Back" :n "k" #'dumb-jump-back)
 
- ;; (:desc "app" :prefix "a"
- ;;   (:desc "shell" :prefix "s"
- ;;     :desc "eshell"     :n "e" #'+eshell:run
- ;;     :desc "multi-term" :n "m" #'multi-term))
+   (:desc "app" :prefix "a"
+     (:desc "shell" :prefix "s"
+       :desc "eshell"     :n "e" #'+eshell:run
+       :desc "multi-term" :n "m" #'multi-term))
 
- ;; :n "cq" #'fill-paragraph
- ;; :n "ca" #'auto-fill-mode
- ;; :n "cc" #'count-words-region
+   :n "cq" #'fill-paragraph
+   :n "ca" #'auto-fill-mode
+   :n "cc" #'count-words-region)
 
  (:after ivy
    :map ivy-minibuffer-map
