@@ -193,7 +193,8 @@
      :desc "Yank filename"             :n "y" #'+hlissner/yank-buffer-filename)
 
    (:desc "git" :prefix "g"
-     :desc "Git status"            :n  "S"  #'magit-status
+     :desc "Git status"            :n  "SS" #'magit-status
+     :desc "Git status (prefix)"   :n  "Ss" #'prefix-magit-status
      :desc "Git blame"             :n  "B"  #'magit-blame
      :desc "Git time machine"      :n  "t"  #'git-timemachine-toggle
      :desc "Git stage hunk"        :n  "s"  #'git-gutter:stage-hunk

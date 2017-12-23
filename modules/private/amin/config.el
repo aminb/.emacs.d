@@ -176,21 +176,16 @@ FILENAME defaults to `buffer-file-name'."
   :config (global-page-break-lines-mode))
 
 (after! magit
-  ;; Set Magit's repo dirs for `magit-status' from Projectile's known projects.
-  ;; Initialize the `magit-repository-directories' immediately after Projectile
-  ;; was loaded, and update it every time we switch projects, because the new
-  ;; project might have been unknown before.
-  (defun magit-set-repo-dirs-from-projectile ()
-    "Set `magit-repo-dirs' from known Projectile projects."
-    (let ((project-dirs (bound-and-true-p projectile-known-projects)))
-      ;; Remove trailing slashes from project directories, because
-      ;; Magit adds trailing slashes again, which breaks the
-      ;; presentation in the Magit prompt.
-      (setq magit-repository-directories
-            (mapcar #'directory-file-name project-dirs))))
+  ;; Set Magit's repo dirs for `magit-status' manually. Remove trailing slashes
+  ;; from project directories, because Magit adds trailing slashes again, which
+  ;; breaks the presentation in the Magit prompt.
+  (setq magit-repository-directories
+        '(("~/.emacs.d" . 0)
+          ("~/dotfiles" . 0)
+          ("~/src"      . 2))))
 
-  (with-eval-after-load 'projectile
-    (magit-set-repo-dirs-from-projectile))
-
-  (add-hook 'projectile-switch-project-hook
-            #'magit-set-repo-dirs-from-projectile))
+(defun prefix-magit-status ()
+  "Always call `magit-status' with prefix arg."
+  (interactive)
+  (let ((current-prefix-arg t))
+    (call-interactively 'magit-status)))
