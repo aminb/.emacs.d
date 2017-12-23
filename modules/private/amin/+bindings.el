@@ -193,15 +193,21 @@
      :desc "Yank filename"             :n "y" #'+hlissner/yank-buffer-filename)
 
    (:desc "git" :prefix "g"
-     :desc "Git status"            :n  "S" #'magit-status
-     :desc "Git blame"             :n  "b" #'magit-blame
-     :desc "Git time machine"      :n  "t" #'git-timemachine-toggle
-     :desc "Git stage hunk"        :n  "s" #'git-gutter:stage-hunk
-     :desc "Git revert hunk"       :n  "r" #'git-gutter:revert-hunk
-     :desc "Git revert buffer"     :n  "R" #'vc-revert
-     :desc "List gists"            :n  "g" #'+gist:list
-     :desc "Next hunk"             :nv "]" #'git-gutter:next-hunk
-     :desc "Previous hunk"         :nv "[" #'git-gutter:previous-hunk)
+     :desc "Git status"            :n  "S"  #'magit-status
+     :desc "Git blame"             :n  "B"  #'magit-blame
+     :desc "Git time machine"      :n  "t"  #'git-timemachine-toggle
+     :desc "Git stage hunk"        :n  "s"  #'git-gutter:stage-hunk
+     :desc "Git revert hunk"       :n  "r"  #'git-gutter:revert-hunk
+     :desc "Git revert buffer"     :n  "R"  #'vc-revert
+     :desc "Git fetch"             :n  "f"  #'magit-fetch
+     :desc "Git push"              :n  "p"  #'magit-push
+     :desc "Git commit"            :n  "cc" #'magit-commit
+     :desc "Git commit amend"      :n  "ca" #'magit-commit-amend
+     :desc "Git checkout"          :n  "bb" #'magit-checkout
+     :desc "Git branch"            :n  "bc" #'magit-checkout
+     :desc "List gists"            :n  "g"  #'+gist:list
+     :desc "Next hunk"             :nv "]"  #'git-gutter:next-hunk
+     :desc "Previous hunk"         :nv "["  #'git-gutter:previous-hunk)
 
    (:desc "help" :prefix "h"
      :n "h" help-map
