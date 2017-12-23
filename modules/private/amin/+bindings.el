@@ -51,11 +51,11 @@
  ;; Other sensible, textmate-esque global bindings
  :ne "M-r"   #'+eval/buffer
  :ne "M-R"   #'+eval/region-and-replace
- :ne "M-b"   #'+eval/build
+ ;; :ne "M-b"   #'+eval/build
  :ne "M-a"   #'mark-whole-buffer
  :ne "M-c"   #'evil-yank
- :ne "M-q"   (if (daemonp) #'delete-frame #'save-buffers-kill-emacs)
- :ne "M-f"   #'swiper
+ ;; :ne "M-q"   (if (daemonp) #'delete-frame #'save-buffers-kill-emacs)
+ ;; :ne "M-f"   #'swiper
  :ne "C-M-f" #'doom/toggle-fullscreen
  :n  "M-s"   #'save-buffer
  :m  "A-j"   #'+hlissner:multi-next-line
@@ -262,14 +262,15 @@
        :desc "Send project to Launchbar" :n "L" #'+macos/send-project-to-launchbar))
 
    (:desc "project" :prefix "p"
-     :desc "Browse project"          :n  "." (find-file-in! (doom-project-root))
-     :desc "Find file in project"    :n  "/" #'projectile-find-file
-     :desc "Run cmd in project root" :nv "!" #'projectile-run-shell-command-in-root
-     :desc "Switch project"          :n  "p" #'projectile-switch-project
-     :desc "Recent project files"    :n  "r" #'projectile-recentf
-     :desc "List project tasks"      :n  "t" #'+ivy/tasks
-     :desc "Pop term in project"     :n  "o" #'+term/open-popup-in-project
-     :desc "Invalidate cache"        :n  "x" #'projectile-invalidate-cache)
+     :desc "Browse project"          :n  "."   (find-file-in! (doom-project-root))
+     :desc "Find file in project"    :n  "/"   #'projectile-find-file
+     :desc "Search project with rg"  :n  "SPC" #'counsel-projectile-rg
+     :desc "Run cmd in project root" :nv "!"   #'projectile-run-shell-command-in-root
+     :desc "Switch project"          :n  "p"   #'projectile-switch-project
+     :desc "Recent project files"    :n  "r"   #'projectile-recentf
+     :desc "List project tasks"      :n  "t"   #'+ivy/tasks
+     :desc "Pop term in project"     :n  "o"   #'+term/open-popup-in-project
+     :desc "Invalidate cache"        :n  "x"   #'projectile-invalidate-cache)
 
    (:desc "quit" :prefix "q"
      :desc "Quit"                   :n "q" #'evil-save-and-quit
@@ -553,7 +554,7 @@
    :map ivy-minibuffer-map
    [escape] #'keyboard-escape-quit
    "C-SPC" #'ivy-call-and-recenter
-   "TAB" #'ivy-partial
+   ;; "TAB" #'ivy-partial
    "M-v" #'yank
    "M-z" #'undo
    "C-r" #'evil-paste-from-register
