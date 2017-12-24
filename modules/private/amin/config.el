@@ -39,14 +39,16 @@
 
    (:desc "git" :prefix "g"
      :desc "Git status"          :n "SPC" #'magit-status
-     :desc "Git status (prefix)" :n "S"   #'prefix-magit-status
+     :desc "Git status (prefix)" :n "S"   #'magit-status-prefix
+     :desc "Git blame"           :n "B"   #'magit-blame
      :desc "Git fetch"           :n "f"   #'magit-fetch
      :desc "Git pull"            :n "F"   #'magit-pull
      :desc "Git push"            :n "P"   #'magit-push
      (:desc "Git commit" :prefix "c"
        :desc "commit" :n "c" #'magit-commit
        :desc "amend"  :n "a" #'magit-commit-amend)
-     (:desc "Git branch" :prefix "B"
+     :n "b" nil  ; unbind SPC g b
+     (:desc "Git branch" :prefix "b"
        :desc "checkout" :n "b" #'magit-checkout
        :desc "create"   :n "c" #'magit-branch))
 
@@ -229,8 +231,11 @@ FILENAME defaults to `buffer-file-name'."
           ("~/dotfiles" . 0)
           ("~/src"      . 2))))
 
-(defun prefix-magit-status ()
-  "Always call `magit-status' with prefix arg."
+(defun magit-status-prefix ()
+  "Always call `magit-status' with prefix arg. This will cause
+magit to ask for a repository even if the current directory is
+already a repository. This is handy when wanting to switch over
+to another project."
   (interactive)
   (let ((current-prefix-arg t))
     (call-interactively 'magit-status)))
