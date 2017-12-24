@@ -153,25 +153,25 @@ FILENAME defaults to `buffer-file-name'."
 (after! dumb-jump
   (setq dumb-jump-force-searcher 'rg))
 
-;; core/core-ui -- distraction-free and centered editing
-(def-package! visual-fill-column
-  :init
-  (dolist (hook '(prog-mode-hook
-                  text-mode-hook
-                  ;; notmuch-show-hook
-                  ;; haskell-cabal-mode-hook
-                  ))
-    (add-hook hook #'visual-fill-column-mode))
-  :config
-  ;; Center text by default and move the fringes close to the text.
-  (setq-default visual-fill-column-center-text t
-                visual-fill-column-fringes-outside-margins nil
-                ;; take into account the line numbers in Emacs 26
-                visual-fill-column-width (+ fill-column 6))
-  ;; Split windows vertically despite large margins, because Emacs otherwise
-  ;; refuses to vertically split windows with large margins
-  (setq split-window-preferred-function
-        #'visual-fill-column-split-window-sensibly))
+;; ;; core/core-ui -- distraction-free and centered editing
+;; (def-package! visual-fill-column
+;;   :init
+;;   (dolist (hook '(prog-mode-hook
+;;                   text-mode-hook
+;;                   ;; notmuch-show-hook
+;;                   ;; haskell-cabal-mode-hook
+;;                   ))
+;;     (add-hook hook #'visual-fill-column-mode))
+;;   :config
+;;   ;; Center text by default and move the fringes close to the text.
+;;   (setq-default visual-fill-column-center-text t
+;;                 visual-fill-column-fringes-outside-margins nil
+;;                 ;; take into account the line numbers in Emacs 26
+;;                 visual-fill-column-width (+ fill-column 6))
+;;   ;; Split windows vertically despite large margins, because Emacs otherwise
+;;   ;; refuses to vertically split windows with large margins
+;;   (setq split-window-preferred-function
+;;         #'visual-fill-column-split-window-sensibly))
 
 ;; lang/org
 (after! org-mode
