@@ -27,10 +27,9 @@
  :ne "M-q" #'fill-paragraph
 
  "C-s"        #'swiper
- "C-S-l"      #'recenter
  "C-x C-b"    #'ibuffer
  [C-S-return] #'recompile
- :n "gl"      #'recenter
+ :e "C-S-l"   #'recenter
  :n "/"       #'swiper
 
  (:leader
