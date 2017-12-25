@@ -26,11 +26,13 @@
  :ne "M-f" #'forward-word
  :ne "M-q" #'fill-paragraph
 
- "C-s"        #'swiper
- "C-x C-b"    #'ibuffer
- [C-S-return] #'recompile
- :e "C-S-l"   #'recenter
- :n "/"       #'swiper
+ "C-c <left>"  #'winner-undo
+ "C-c <right>" #'winner-redo
+ "C-s"         #'swiper
+ "C-x C-b"     #'ibuffer
+ [C-S-return]  #'recompile
+ :e "C-S-l"    #'recenter
+ :n "/"        #'swiper
 
  (:leader
    :desc "Dashboard" :n "d" #'+doom-dashboard/open
