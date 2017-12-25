@@ -42,6 +42,7 @@
      :desc "Git status"          :n "SPC" #'magit-status
      :desc "Git status (prefix)" :n "S"   #'magit-status-prefix
      :desc "Git blame"           :n "B"   #'magit-blame
+     :desc "Git clone"           :n "C"   #'magit-clone
      :desc "Git fetch"           :n "f"   #'magit-fetch
      :desc "Git pull"            :n "F"   #'magit-pull
      :desc "Git push"            :n "P"   #'magit-push
@@ -222,6 +223,10 @@ FILENAME defaults to `buffer-file-name'."
 ;; core/core-ui
 (def-package! page-break-lines
   :config (global-page-break-lines-mode))
+
+;; feature/version-control
+(def-package! magit
+  :commands (magit-clone))
 
 (after! magit
   ;; Set Magit's repo dirs for `magit-status' manually. Remove trailing slashes
