@@ -20,6 +20,20 @@
       org-ellipsis "  "
       )
 
+(dolist (ft (fontset-list))
+  (set-fontset-font
+   ft
+   'unicode
+   (font-spec :name "Hack" :size 14))
+  (set-fontset-font
+   ft
+   'unicode
+   (font-spec
+    :name "Symbola monospacified for DejaVu Sans Mono"
+    :size 14)
+   nil
+   'append))
+
 (setq-default fill-column 80
               ;; bidi-display-reordering t
               frame-inhibit-implied-resize nil)
