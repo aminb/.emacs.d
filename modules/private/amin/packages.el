@@ -8,3 +8,7 @@
 (package! exec-path-from-shell)
 
 (package! page-break-lines)
+
+(package! nix-mode)
+
+(package! dired+)

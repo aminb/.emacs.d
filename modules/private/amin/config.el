@@ -38,6 +38,9 @@
    :desc "Dashboard" :n "d" #'+doom-dashboard/open
    :desc "Centered"  :n "C" #'centered-window-mode
 
+   (:desc "buffer" :prefix "b"
+     :desc "Ibuffer" :n "i" #'ibuffer)
+
    (:desc "git" :prefix "g"
      :desc "Git status"          :n "SPC" #'magit-status
      :desc "Git status (prefix)" :n "S"   #'magit-status-prefix
@@ -245,3 +248,10 @@ to another project."
   (interactive)
   (let ((current-prefix-arg t))
     (call-interactively 'magit-status)))
+
+
+;; lang/nix
+(def-package! nix-mode)
+
+(def-package! dired+
+  :config (diredp-toggle-find-file-reuse-dir 1))
