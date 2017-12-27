@@ -2,7 +2,7 @@
 .cask/
 var/
 /init.el
-modules/private/
+# modules/private/
 
 # emacs tempfiles that shouldn't be there
 .mc-lists.el
