@@ -33,6 +33,9 @@
  [C-S-return]  #'recompile
  :e "C-S-l"    #'recenter
  :n "/"        #'swiper
+ ;; "C-x C-0"     #'zoom-in/out
+ ;; "M--"         #'zoom-out
+ ;; "M-="         #'zoom-in
 
  (:leader
    :desc "Dashboard" :n "d" #'+doom-dashboard/open
@@ -363,3 +366,5 @@ to another project."
   ("/" ibuffer-filter-disable "disable")
   ("b" hydra-ibuffer-main/body "back" :color blue))
 
+;; (def-package! zoom-frm
+;;   :commands (zoom-in/out zoom-in zoom-out))

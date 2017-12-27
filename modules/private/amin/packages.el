@@ -12,3 +12,7 @@
 (package! nix-mode)
 
 (package! dired+)
+
+;; (package! zoom-frm
+;;   :recipe
+;;   (:fetcher github :repo "emacsmirror/zoom-frm"))
