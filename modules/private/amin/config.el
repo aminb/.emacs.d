@@ -27,6 +27,7 @@
  :ne "M-b" #'backward-word
  :ne "M-f" #'forward-word
  :ne "M-q" #'fill-paragraph
+ "M-Q"     #'doom/delete-frame
 
  "C-c <left>"  #'winner-undo
  "C-c <right>" #'winner-redo
@@ -132,8 +133,13 @@
   ;; elegant, so we use those.
   (setq org-bullets-bullet-list '("#")))
 
-;; core/core-ui -- disable line numbers
+;;
+;; core/core-ui
+;;
+;; disable line numbers
 (remove-hook! (prog-mode text-mode conf-mode) #'doom|enable-line-numbers)
+;; disable blinking cursor
+(remove-hook! 'doom-post-init-hook #'blink-cursor-mode)
 
 ;; lang/latex
 (setq TeX-PDF-mode t     ; use PDFTeX
