@@ -79,10 +79,6 @@
    :n "ca" #'auto-fill-mode
    :n "cc" #'count-words-region)
 
- (:after ivy
-   :map ivy-minibuffer-map
-   "TAB" #'ivy-partial-or-done)
-
  (:after emmet
    (:map emmet-mode-keymap
      :i [C-return] #'emmet-expand-yas))
